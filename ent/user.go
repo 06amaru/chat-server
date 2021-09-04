@@ -20,6 +20,38 @@ type User struct {
 	Username string `json:"username,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges UserEdges `json:"edges"`
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// Messages holds the value of the messages edge.
+	Messages []*Message `json:"messages,omitempty"`
+	// Chats holds the value of the chats edge.
+	Chats []*Chat `json:"chats,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// MessagesOrErr returns the Messages value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) MessagesOrErr() ([]*Message, error) {
+	if e.loadedTypes[0] {
+		return e.Messages, nil
+	}
+	return nil, &NotLoadedError{edge: "messages"}
+}
+
+// ChatsOrErr returns the Chats value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) ChatsOrErr() ([]*Chat, error) {
+	if e.loadedTypes[1] {
+		return e.Chats, nil
+	}
+	return nil, &NotLoadedError{edge: "chats"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -69,6 +101,16 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 		}
 	}
 	return nil
+}
+
+// QueryMessages queries the "messages" edge of the User entity.
+func (u *User) QueryMessages() *MessageQuery {
+	return (&UserClient{config: u.config}).QueryMessages(u)
+}
+
+// QueryChats queries the "chats" edge of the User entity.
+func (u *User) QueryChats() *ChatQuery {
+	return (&UserClient{config: u.config}).QueryChats(u)
 }
 
 // Update returns a builder for updating this User.

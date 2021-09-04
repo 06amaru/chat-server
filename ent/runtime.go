@@ -3,6 +3,8 @@
 package ent
 
 import (
+	"fluent/ent/chat"
+	"fluent/ent/message"
 	"fluent/ent/schema"
 	"fluent/ent/user"
 	"time"
@@ -12,6 +14,22 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	chatFields := schema.Chat{}.Fields()
+	_ = chatFields
+	// chatDescDeleted is the schema descriptor for deleted field.
+	chatDescDeleted := chatFields[2].Descriptor()
+	// chat.DefaultDeleted holds the default value on creation for the deleted field.
+	chat.DefaultDeleted = chatDescDeleted.Default.(bool)
+	messageFields := schema.Message{}.Fields()
+	_ = messageFields
+	// messageDescBody is the schema descriptor for body field.
+	messageDescBody := messageFields[0].Descriptor()
+	// message.BodyValidator is a validator for the "body" field. It is called by the builders before save.
+	message.BodyValidator = messageDescBody.Validators[0].(func(string) error)
+	// messageDescCreatedAt is the schema descriptor for created_at field.
+	messageDescCreatedAt := messageFields[1].Descriptor()
+	// message.DefaultCreatedAt holds the default value on creation for the created_at field.
+	message.DefaultCreatedAt = messageDescCreatedAt.Default.(func() time.Time)
 	userFields := schema.User{}.Fields()
 	_ = userFields
 	// userDescUsername is the schema descriptor for username field.
