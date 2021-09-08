@@ -154,7 +154,7 @@ func (manager *ChatManager) handle(c echo.Context) error {
 		chat.join <- user
 		user.Read()
 
-		go chat.Run()
+		//go chat.Run()
 	} else {
 		chat := &Chat{
 			users:    make(map[string]*User),
