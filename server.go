@@ -92,6 +92,7 @@ type Chat struct {
 }
 
 func (c *Chat) Run() {
+	fmt.Println("running chat ... ")
 	for {
 		select {
 		case user := <-c.join:
@@ -170,10 +171,14 @@ func (manager *ChatManager) handle(c echo.Context) error {
 			Global:   chat,
 		}
 
-		chat.join <- user
-		user.Read()
-
 		go chat.Run()
+
+		fmt.Println("joining...")
+		chat.join <- user
+		fmt.Println("joined user 1 ...")
+		user.Read()
+		fmt.Println("done ...")
+
 	}
 
 	return nil
