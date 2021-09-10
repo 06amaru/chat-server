@@ -57,6 +57,8 @@ func (u *User) Read() {
 			log.Println("Error on read message: ", err.Error())
 			break
 		} else {
+			fmt.Println("reading ...")
+			fmt.Println(message)
 			u.Global.messages <- NewMessage(string(message), u.Username)
 		}
 	}
@@ -114,7 +116,7 @@ func (c *Chat) add(user *User) {
 }
 
 func (c *Chat) broadcast(message *Message) {
-	log.Printf("Broadcast message: %v\n", message)
+	fmt.Printf("Broadcast message: %v\n", message)
 	for _, user := range c.users {
 		user.Write(message)
 	}
@@ -146,6 +148,7 @@ func (manager *ChatManager) handle(c echo.Context) error {
 	if chat, ok := manager.chats[chatID]; ok {
 		//conectar cliente con web socket
 		//TODO: conseguir user desde JWT
+		fmt.Println("chat saved ...")
 		user := &User{
 			Username: "jaoks",
 			Conn:     ws,
@@ -170,7 +173,7 @@ func (manager *ChatManager) handle(c echo.Context) error {
 			Conn:     ws,
 			Global:   chat,
 		}
-
+		manager.chats[chatID] = chat
 		go chat.Run()
 
 		fmt.Println("joining...")
