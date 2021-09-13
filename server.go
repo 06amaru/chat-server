@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/websocket"
-
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -41,8 +42,55 @@ func main() {
 	}
 
 	e.GET("/chats/:id", chatManager.handle)
+	e.POST("/login", login)
+
+	r := e.Group("/auth")
+	{
+		config := middleware.JWTConfig{
+			Claims:     &jwtCustomClaims{},
+			SigningKey: []byte("iosonic"),
+		}
+		r.Use(middleware.JWTWithConfig(config))
+		r.GET("/", func(c echo.Context) error {
+			return c.String(http.StatusOK, "Hello, World!\n")
+		})
+	}
+
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
+}
+
+type jwtCustomClaims struct {
+	Username string `json:"username"`
+	jwt.StandardClaims
+}
+
+func login(c echo.Context) error {
+	username := c.FormValue("username")
+	password := c.FormValue("password")
+
+	if username != "jon" || password != "123456" {
+		return echo.ErrUnauthorized
+	}
+
+	claims := &jwtCustomClaims{
+		"username",
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	//TODO: put signing key to env variable
+	t, err := token.SignedString([]byte("iosonic"))
+	if err != nil {
+		return err
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{
+		"token": t,
+	})
 }
 
 type User struct {
@@ -135,6 +183,11 @@ func (c *Chat) disconnect(user *User) {
 type ChatManager struct {
 	chats map[string]*Chat
 }
+
+// originalmente el chat id puede ser null o int
+// si el chat id es null es porque el cliente esta empezando una nueva conversacion
+// se debe crear un historial del chat en la base de datos
+// si el chat id es int conseguir el historial y conseguir el chat desde el manager
 
 func (manager *ChatManager) handle(c echo.Context) error {
 	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
