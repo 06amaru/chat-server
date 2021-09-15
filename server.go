@@ -1,11 +1,12 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
+
+	. "fluent/chat"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/websocket"
@@ -93,93 +94,6 @@ func login(c echo.Context) error {
 	})
 }
 
-type User struct {
-	Username string
-	Conn     *websocket.Conn
-	Global   *Chat
-}
-
-func (u *User) Read() {
-	for {
-		if _, message, err := u.Conn.ReadMessage(); err != nil {
-			log.Println("Error on read message: ", err.Error())
-			break
-		} else {
-			fmt.Println("reading ...")
-			fmt.Println(message)
-			u.Global.messages <- NewMessage(string(message), u.Username)
-		}
-	}
-}
-
-func (u *User) Write(message *Message) {
-	b, _ := json.Marshal(message)
-
-	if err := u.Conn.WriteMessage(websocket.TextMessage, b); err != nil {
-		log.Println("Error on write message:", err.Error())
-	}
-}
-
-type Message struct {
-	ID     int64  `json:"id"`
-	Body   string `json:"body"`
-	Sender string `json:"sender"`
-}
-
-func NewMessage(body string, sender string) *Message {
-	return &Message{
-		ID:     1,
-		Body:   body,
-		Sender: sender,
-	}
-}
-
-type Chat struct {
-	users    map[string]*User
-	messages chan *Message
-	join     chan *User
-	leave    chan *User
-}
-
-func (c *Chat) Run() {
-	fmt.Println("running chat ... ")
-	for {
-		select {
-		case user := <-c.join:
-			c.add(user)
-		case message := <-c.messages:
-			c.broadcast(message)
-		case user := <-c.leave:
-			c.disconnect(user)
-		}
-	}
-}
-func (c *Chat) add(user *User) {
-	if _, ok := c.users[user.Username]; !ok {
-		c.users[user.Username] = user
-
-		body := fmt.Sprintf("%s join the chat", user.Username)
-		c.broadcast(NewMessage(body, "Server"))
-	}
-}
-
-func (c *Chat) broadcast(message *Message) {
-	fmt.Printf("Broadcast message: %v\n", message)
-	for _, user := range c.users {
-		user.Write(message)
-	}
-}
-
-func (c *Chat) disconnect(user *User) {
-	if _, ok := c.users[user.Username]; ok {
-		defer user.Conn.Close()
-		delete(c.users, user.Username)
-
-		body := fmt.Sprintf("%s left the chat", user.Username)
-		c.broadcast(NewMessage(body, "Server"))
-	}
-}
-
 type ChatManager struct {
 	chats map[string]*Chat
 }
@@ -198,26 +112,26 @@ func (manager *ChatManager) handle(c echo.Context) error {
 	defer ws.Close()
 
 	// conseguir el chat
-	if chat, ok := manager.chats[chatID]; ok {
+	if room, ok := manager.chats[chatID]; ok {
 		//conectar cliente con web socket
 		//TODO: conseguir user desde JWT
 		fmt.Println("chat saved ...")
 		user := &User{
 			Username: "jaoks",
 			Conn:     ws,
-			Global:   chat,
+			Global:   room,
 		}
 
-		chat.join <- user
+		room.Join <- user
 		user.Read()
 
 		//go chat.Run()
 	} else {
 		chat := &Chat{
-			users:    make(map[string]*User),
-			messages: make(chan *Message),
-			join:     make(chan *User),
-			leave:    make(chan *User),
+			Users:    make(map[string]*User),
+			Messages: make(chan *Message),
+			Join:     make(chan *User),
+			Leave:    make(chan *User),
 		}
 
 		//TODO: conseguir user desde JWT
@@ -230,7 +144,7 @@ func (manager *ChatManager) handle(c echo.Context) error {
 		go chat.Run()
 
 		fmt.Println("joining...")
-		chat.join <- user
+		chat.Join <- user
 		fmt.Println("joined user 1 ...")
 		user.Read()
 		fmt.Println("done ...")
