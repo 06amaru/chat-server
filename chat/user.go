@@ -2,6 +2,7 @@ package chat
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 
 	"github.com/gorilla/websocket"
@@ -19,7 +20,9 @@ func (u *User) Read() {
 			log.Println("Error on read message: ", err.Error())
 			break
 		} else {
-			u.Global.messages <- NewMessage(string(message), u.Username)
+			fmt.Println("reading ...")
+			fmt.Println(message)
+			u.Global.Messages <- NewMessage(string(message), u.Username)
 		}
 	}
 }
