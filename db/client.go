@@ -1,16 +1,23 @@
-package main
+package db
 
 import (
-	"context"
 	"fluent/ent"
-	"fluent/ent/user"
-	"fmt"
 	"log"
 
 	_ "github.com/lib/pq"
 )
 
-func main() {
+func GetClient() (*ent.Client, error) {
+	client, err := ent.Open("postgres", "host=127.0.0.1 port=5434 user=postgres dbname=postgres password=123456 sslmode=disable")
+	if err != nil {
+		log.Fatalf("failed opening connection to postgres: %v", err)
+		return nil, err
+	}
+
+	return client, nil
+}
+
+/*func main() {
 	client, err := ent.Open("postgres", "host=127.0.0.1 port=5434 user=postgres dbname=postgres password=123456 sslmode=disable")
 	if err != nil {
 		log.Fatalf("failed opening connection to postgres: %v", err)
@@ -53,4 +60,4 @@ func QueryUserById(ctx context.Context, client *ent.Client, id int) (*ent.User, 
 	}
 	log.Println("user returned: ", u)
 	return u, nil
-}
+}*/
