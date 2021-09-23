@@ -18,6 +18,7 @@ func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("username").Default("unknown"),
 		field.Time("created_at").Default(time.Now),
+		field.String("password").Default("isnotasecret"),
 	}
 }
 
