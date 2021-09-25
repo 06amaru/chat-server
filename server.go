@@ -7,6 +7,7 @@ import (
 	"time"
 
 	. "fluent/chat"
+	"fluent/db"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/websocket"
@@ -28,6 +29,12 @@ var (
 func main() {
 	// Echo instance
 	e := echo.New()
+
+	// Ent client
+	_, err := db.GetClient()
+	if err != nil {
+		log.Panicln("Database could not initialize")
+	}
 
 	// Middleware
 	e.Use(middleware.Logger())
