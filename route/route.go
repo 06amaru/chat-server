@@ -1,8 +1,10 @@
 package route
 
 import (
+	"context"
 	. "fluent/chat"
 	"fluent/ent"
+	"fluent/ent/user"
 	"fmt"
 	"log"
 	"net/http"
@@ -44,6 +46,15 @@ func (r *Route) JoinChat(manager map[string]*Chat) echo.HandlerFunc {
 		}
 		defer ws.Close()
 
+		//TODO: conseguir user desde JWT
+		userClient, err := r.db.User.
+			Query().
+			Where(user.UsernameEQ("jaoks")).
+			First(context.Background())
+		if err != nil {
+			fmt.Println(err)
+		}
+
 		// conseguir el chat
 		if room, ok := manager[chatID]; ok {
 			//conectar cliente con web socket
@@ -52,11 +63,11 @@ func (r *Route) JoinChat(manager map[string]*Chat) echo.HandlerFunc {
 			user := &User{
 				Username: "jaoks",
 				Conn:     ws,
-				Global:   room,
+				Room:     room,
 			}
 
 			room.Join <- user
-			user.Read()
+			user.Read(r.db, userClient)
 
 			//go chat.Run()
 		} else {
@@ -65,21 +76,40 @@ func (r *Route) JoinChat(manager map[string]*Chat) echo.HandlerFunc {
 				Messages: make(chan *Message),
 				Join:     make(chan *User),
 				Leave:    make(chan *User),
+				Id:       chatID,
 			}
 
-			//TODO: conseguir user desde JWT
 			user := &User{
 				Username: "amaru",
 				Conn:     ws,
-				Global:   chat,
+				Room:     chat,
 			}
 			manager[chatID] = chat
+
+			fmt.Println("Crear chat ...")
+			// crear chat en la bd
+			if chatClient, err := r.db.Chat.
+				Create().
+				SetName(chatID).
+				SetType("private").
+				SetDeleted(false).
+				Save(context.Background()); err != nil {
+				fmt.Println(err)
+			} else {
+				fmt.Println(chatClient)
+			}
+
+			/*
+				if err != nil {
+					return c.String(http.StatusBadRequest, err.Error())
+				}*/
+
 			go chat.Run()
 
 			fmt.Println("joining...")
 			chat.Join <- user
 			fmt.Println("joined user 1 ...")
-			user.Read()
+			user.Read(r.db, userClient)
 			fmt.Println("done ...")
 
 		}

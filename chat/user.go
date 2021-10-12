@@ -1,7 +1,9 @@
 package chat
 
 import (
+	"context"
 	"encoding/json"
+	"fluent/ent"
 	"fmt"
 	"log"
 
@@ -11,10 +13,10 @@ import (
 type User struct {
 	Username string
 	Conn     *websocket.Conn
-	Global   *Chat
+	Room     *Chat
 }
 
-func (u *User) Read() {
+func (u *User) Read(client *ent.Client, userClient *ent.User) {
 	for {
 		if _, message, err := u.Conn.ReadMessage(); err != nil {
 			log.Println("Error on read message: ", err.Error())
@@ -22,7 +24,17 @@ func (u *User) Read() {
 		} else {
 			fmt.Println("reading ...")
 			fmt.Println(message)
-			u.Global.Messages <- NewMessage(string(message), u.Username)
+			_, err := client.Message.
+				Create().
+				SetBody(string(message)).
+				SetFrom(userClient).
+				Save(context.Background())
+			if err != nil {
+				log.Print(err)
+				break
+			}
+
+			u.Room.Messages <- NewMessage(string(message), u.Username)
 		}
 	}
 }

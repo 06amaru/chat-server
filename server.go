@@ -64,6 +64,14 @@ func main() {
 		})
 	}*/
 
+	api := e.Group("/api")
+	{
+		auth := api.Group("/oauth") {
+			// TODO finish sign in
+			// TODO return JWT 
+		}
+	}
+
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
 }
