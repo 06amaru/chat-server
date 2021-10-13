@@ -3,13 +3,11 @@ package main
 import (
 	"log"
 	"net/http"
-	"time"
 
 	. "fluent/chat"
 	"fluent/db"
 	"fluent/route"
 
-	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -50,7 +48,6 @@ func main() {
 	var manager = make(map[string]*Chat)
 
 	e.GET("/chats/:id", r.JoinChat(manager))
-	e.POST("/login", login)
 
 	/*r := e.Group("/auth")
 	{
@@ -66,49 +63,14 @@ func main() {
 
 	api := e.Group("/api")
 	{
-		auth := api.Group("/oauth") {
+		auth := api.Group("/oauth")
+		{
 			// TODO finish sign in
-			// TODO return JWT 
+			auth.POST("/signin", r.SignIn())
+			// TODO return JWT
 		}
 	}
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1323"))
-}
-
-type jwtCustomClaims struct {
-	Username string `json:"username"`
-	jwt.StandardClaims
-}
-
-func login(c echo.Context) error {
-	username := c.FormValue("username")
-	password := c.FormValue("password")
-
-	if username != "jon" || password != "123456" {
-		return echo.ErrUnauthorized
-	}
-
-	claims := &jwtCustomClaims{
-		"username",
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	//TODO: put signing key to env variable
-	t, err := token.SignedString([]byte("iosonic"))
-	if err != nil {
-		return err
-	}
-
-	return c.JSON(http.StatusOK, echo.Map{
-		"token": t,
-	})
-}
-
-type ChatManager struct {
-	chats map[string]*Chat
 }

@@ -117,3 +117,32 @@ func (r *Route) JoinChat(manager map[string]*Chat) echo.HandlerFunc {
 		return nil
 	}
 }
+
+type UserSignIn struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+func (r *Route) SignIn() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		u := new(UserSignIn)
+		if err := c.Bind(u); err != nil {
+			return err
+		}
+
+		if u.Username != "jaoks" {
+			return c.String(http.StatusUnauthorized, "wrong username")
+		}
+
+		if u.Password != "sdtc" {
+			return c.String(http.StatusUnauthorized, "wrong password")
+		}
+
+		jwtoken, err := makeToken(u)
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, err)
+		}
+
+		return c.String(http.StatusOK, jwtoken)
+	}
+}
