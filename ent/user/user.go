@@ -15,6 +15,8 @@ const (
 	FieldUsername = "username"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
+	// FieldPassword holds the string denoting the password field in the database.
+	FieldPassword = "password"
 	// EdgeMessages holds the string denoting the messages edge name in mutations.
 	EdgeMessages = "messages"
 	// EdgeChats holds the string denoting the chats edge name in mutations.
@@ -40,6 +42,7 @@ var Columns = []string{
 	FieldID,
 	FieldUsername,
 	FieldCreatedAt,
+	FieldPassword,
 }
 
 var (
@@ -63,4 +66,6 @@ var (
 	DefaultUsername string
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
+	// DefaultPassword holds the default value on creation for the "password" field.
+	DefaultPassword string
 )

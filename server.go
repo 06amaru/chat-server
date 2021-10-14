@@ -47,27 +47,18 @@ func main() {
 
 	var manager = make(map[string]*Chat)
 
+	// TODO: pass to authenticated routes with JWT
 	e.GET("/chats/:id", r.JoinChat(manager))
 
-	/*r := e.Group("/auth")
-	{
-		config := middleware.JWTConfig{
-			Claims:     &jwtCustomClaims{},
-			SigningKey: []byte("iosonic"),
-		}
-		r.Use(middleware.JWTWithConfig(config))
-		r.GET("/", func(c echo.Context) error {
-			return c.String(http.StatusOK, "Hello, World!\n")
-		})
-	}*/
+	//curl -X POST -H 'Content-Type: application/json' -d '{"username":"jaoks", "password":"sdtc"}' localhost:1323/signup
+	e.POST("/signup", r.SignUp())
 
 	api := e.Group("/api")
 	{
 		auth := api.Group("/oauth")
 		{
-			// TODO finish sign in
+			// curl -X POST -H 'Content-Type: application/json' -d '{"username":"jaoks", "password":"sdtc"}' localhost:1323/api/oauth/signin
 			auth.POST("/signin", r.SignIn())
-			// TODO return JWT
 		}
 	}
 

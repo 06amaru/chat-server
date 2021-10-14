@@ -88,12 +88,13 @@ func (r *Route) JoinChat(manager map[string]*Chat) echo.HandlerFunc {
 
 			fmt.Println("Crear chat ...")
 			// crear chat en la bd
-			if chatClient, err := r.db.Chat.
+			chatClient, err := r.db.Chat.
 				Create().
 				SetName(chatID).
 				SetType("private").
 				SetDeleted(false).
-				Save(context.Background()); err != nil {
+				Save(context.Background())
+			if err != nil {
 				fmt.Println(err)
 			} else {
 				fmt.Println(chatClient)
@@ -130,11 +131,17 @@ func (r *Route) SignIn() echo.HandlerFunc {
 			return err
 		}
 
-		if u.Username != "jaoks" {
-			return c.String(http.StatusUnauthorized, "wrong username")
+		userEnt, err := r.db.User.
+			Query().
+			Where(user.UsernameEQ(u.Username)).
+			First(context.Background())
+
+		//TODO : mejorar mensaje de error por parte de ent user not found
+		if err != nil {
+			return c.JSON(http.StatusUnauthorized, err.Error())
 		}
 
-		if u.Password != "sdtc" {
+		if u.Password != userEnt.Password {
 			return c.String(http.StatusUnauthorized, "wrong password")
 		}
 
@@ -144,5 +151,26 @@ func (r *Route) SignIn() echo.HandlerFunc {
 		}
 
 		return c.String(http.StatusOK, jwtoken)
+	}
+}
+
+func (r *Route) SignUp() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		u := new(UserSignIn)
+		if err := c.Bind(u); err != nil {
+			return err
+		}
+
+		_, err := r.db.User.
+			Create().
+			SetUsername(u.Username).
+			SetPassword(u.Password).
+			Save(context.Background())
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+
+		return c.String(http.StatusOK, "user has been created")
 	}
 }
