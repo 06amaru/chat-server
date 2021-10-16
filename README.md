@@ -13,10 +13,10 @@ mkdir ${HOME}/postgres-data/
 2. Desplegar un contenedor con docker para Postgres
 
 ```
-docker run -d \
-	--name jaoksdb \
-	-e POSTGRES_PASSWORD=123456 \
-	-v ${HOME}/postgres-data/:/var/lib/postgresql/data \
+docker run -d 
+	--name jaoksdb 
+	-e POSTGRES_PASSWORD=123456 
+	-v ${HOME}/postgres-data/:/var/lib/postgresql/data 
         -p 5434:5432
         postgres
 ```
