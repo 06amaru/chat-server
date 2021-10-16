@@ -3,8 +3,8 @@
 package ent
 
 import (
-	"fluent/ent/chat"
 	"fmt"
+	"github.com/amaru0601/fluent/ent/chat"
 	"strings"
 
 	"entgo.io/ent/dialect/sql"

@@ -3,8 +3,8 @@
 package ent
 
 import (
-	"fluent/ent/user"
 	"fmt"
+	"github.com/amaru0601/fluent/ent/user"
 	"strings"
 	"time"
 

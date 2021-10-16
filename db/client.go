@@ -2,9 +2,9 @@ package db
 
 import (
 	"context"
-	"fluent/ent"
 	"fmt"
 
+	"github.com/amaru0601/fluent/ent"
 	_ "github.com/lib/pq"
 )
 

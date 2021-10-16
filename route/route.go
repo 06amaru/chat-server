@@ -2,13 +2,13 @@ package route
 
 import (
 	"context"
-	. "fluent/chat"
-	"fluent/ent"
-	"fluent/ent/user"
 	"fmt"
 	"log"
 	"net/http"
 
+	"github.com/amaru0601/fluent/chat"
+	"github.com/amaru0601/fluent/ent"
+	"github.com/amaru0601/fluent/ent/user"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 )
@@ -37,7 +37,7 @@ func NewRoute(client *ent.Client) *Route {
 // se debe crear un historial del chat en la base de datos
 // si el chat id es int conseguir el historial y conseguir el chat desde el manager
 
-func (r *Route) JoinChat(manager map[string]*Chat) echo.HandlerFunc {
+func (r *Route) JoinChat(manager map[string]*chat.Chat) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 		chatID := c.Param("id")
@@ -60,7 +60,7 @@ func (r *Route) JoinChat(manager map[string]*Chat) echo.HandlerFunc {
 			//conectar cliente con web socket
 			//TODO: conseguir user desde JWT
 			fmt.Println("chat saved ...")
-			user := &User{
+			user := &chat.User{
 				Username: "jaoks",
 				Conn:     ws,
 				Room:     room,
@@ -71,20 +71,20 @@ func (r *Route) JoinChat(manager map[string]*Chat) echo.HandlerFunc {
 
 			//go chat.Run()
 		} else {
-			chat := &Chat{
-				Users:    make(map[string]*User),
-				Messages: make(chan *Message),
-				Join:     make(chan *User),
-				Leave:    make(chan *User),
+			newChat := &chat.Chat{
+				Users:    make(map[string]*chat.User),
+				Messages: make(chan *chat.Message),
+				Join:     make(chan *chat.User),
+				Leave:    make(chan *chat.User),
 				Id:       chatID,
 			}
 
-			user := &User{
+			user := &chat.User{
 				Username: "amaru",
 				Conn:     ws,
-				Room:     chat,
+				Room:     newChat,
 			}
-			manager[chatID] = chat
+			manager[chatID] = newChat
 
 			fmt.Println("Crear chat ...")
 			// crear chat en la bd
@@ -105,10 +105,10 @@ func (r *Route) JoinChat(manager map[string]*Chat) echo.HandlerFunc {
 					return c.String(http.StatusBadRequest, err.Error())
 				}*/
 
-			go chat.Run()
+			go newChat.Run()
 
 			fmt.Println("joining...")
-			chat.Join <- user
+			newChat.Join <- user
 			fmt.Println("joined user 1 ...")
 			user.Read(r.db, userClient)
 			fmt.Println("done ...")

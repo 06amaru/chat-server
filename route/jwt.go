@@ -3,7 +3,7 @@ package route
 import "github.com/golang-jwt/jwt"
 
 var (
-	mySigningKey = []byte("keysign")
+	MySigningKey = []byte("Ja0ks0nE")
 )
 
 func makeToken(user *UserSignIn) (string, error) {
@@ -12,6 +12,6 @@ func makeToken(user *UserSignIn) (string, error) {
 		"password": user.Password,
 	})
 
-	ss, err := jwtoken.SignedString(mySigningKey)
+	ss, err := jwtoken.SignedString(MySigningKey)
 	return ss, err
 }

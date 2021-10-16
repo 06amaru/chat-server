@@ -3,9 +3,9 @@
 package ent
 
 import (
-	"fluent/ent/message"
-	"fluent/ent/user"
 	"fmt"
+	"github.com/amaru0601/fluent/ent/message"
+	"github.com/amaru0601/fluent/ent/user"
 	"strings"
 	"time"
 

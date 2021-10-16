@@ -4,11 +4,11 @@ package ent
 
 import (
 	"context"
-	"fluent/ent/chat"
-	"fluent/ent/message"
-	"fluent/ent/predicate"
-	"fluent/ent/user"
 	"fmt"
+	"github.com/amaru0601/fluent/ent/chat"
+	"github.com/amaru0601/fluent/ent/message"
+	"github.com/amaru0601/fluent/ent/predicate"
+	"github.com/amaru0601/fluent/ent/user"
 	"time"
 
 	"entgo.io/ent/dialect/sql"

@@ -3,7 +3,7 @@
 package chat
 
 import (
-	"fluent/ent/predicate"
+	"github.com/amaru0601/fluent/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"

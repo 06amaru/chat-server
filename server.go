@@ -4,10 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	. "fluent/chat"
-	"fluent/db"
-	"fluent/route"
-
+	"github.com/amaru0601/fluent/chat"
+	"github.com/amaru0601/fluent/db"
+	"github.com/amaru0601/fluent/route"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -45,7 +44,7 @@ func main() {
 		return c.String(http.StatusOK, "Hello, World!\n")
 	})
 
-	var manager = make(map[string]*Chat)
+	var manager = make(map[string]*chat.Chat)
 
 	// TODO: pass to authenticated routes with JWT
 	e.GET("/chats/:id", r.JoinChat(manager))
@@ -59,6 +58,11 @@ func main() {
 		{
 			// curl -X POST -H 'Content-Type: application/json' -d '{"username":"jaoks", "password":"sdtc"}' localhost:1323/api/oauth/signin
 			auth.POST("/signin", r.SignIn())
+		}
+		fluent := api.Group("/fluent")
+		{
+			fluent.Use(middleware.JWT(route.MySigningKey))
+
 		}
 	}
 

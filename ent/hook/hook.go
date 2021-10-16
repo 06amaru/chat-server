@@ -4,8 +4,8 @@ package hook
 
 import (
 	"context"
-	"fluent/ent"
 	"fmt"
+	"github.com/amaru0601/fluent/ent"
 )
 
 // The ChatFunc type is an adapter to allow the use of ordinary

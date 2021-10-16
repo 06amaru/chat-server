@@ -4,9 +4,9 @@ package enttest
 
 import (
 	"context"
-	"fluent/ent"
+	"github.com/amaru0601/fluent/ent"
 	// required by schema hooks.
-	_ "fluent/ent/runtime"
+	_ "github.com/amaru0601/fluent/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
 )

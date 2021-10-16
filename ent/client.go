@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"log"
 
-	"fluent/ent/migrate"
+	"github.com/amaru0601/fluent/ent/migrate"
 
-	"fluent/ent/chat"
-	"fluent/ent/message"
-	"fluent/ent/user"
+	"github.com/amaru0601/fluent/ent/chat"
+	"github.com/amaru0601/fluent/ent/message"
+	"github.com/amaru0601/fluent/ent/user"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"

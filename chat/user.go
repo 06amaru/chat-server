@@ -3,10 +3,10 @@ package chat
 import (
 	"context"
 	"encoding/json"
-	"fluent/ent"
 	"fmt"
 	"log"
 
+	"github.com/amaru0601/fluent/ent"
 	"github.com/gorilla/websocket"
 )
 

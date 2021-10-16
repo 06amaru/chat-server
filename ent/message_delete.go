@@ -4,9 +4,9 @@ package ent
 
 import (
 	"context"
-	"fluent/ent/message"
-	"fluent/ent/predicate"
 	"fmt"
+	"github.com/amaru0601/fluent/ent/message"
+	"github.com/amaru0601/fluent/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"

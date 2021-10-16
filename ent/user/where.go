@@ -3,7 +3,7 @@
 package user
 
 import (
-	"fluent/ent/predicate"
+	"github.com/amaru0601/fluent/ent/predicate"
 	"time"
 
 	"entgo.io/ent/dialect/sql"

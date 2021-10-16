@@ -3,10 +3,10 @@
 package ent
 
 import (
-	"fluent/ent/chat"
-	"fluent/ent/message"
-	"fluent/ent/schema"
-	"fluent/ent/user"
+	"github.com/amaru0601/fluent/ent/chat"
+	"github.com/amaru0601/fluent/ent/message"
+	"github.com/amaru0601/fluent/ent/schema"
+	"github.com/amaru0601/fluent/ent/user"
 	"time"
 )
 
