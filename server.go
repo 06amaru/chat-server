@@ -44,8 +44,10 @@ func main() {
 		return c.String(http.StatusOK, "Hello, World!\n")
 	})
 
+	// encargado de almacenar las direcciones de memoria de los chats para luego poder conectarse
 	var manager = make(map[string]*chat.Chat)
 
+	//TODO HASH PASSWORD
 	//curl -X POST -H 'Content-Type: application/json' -d '{"username":"jaoks", "password":"sdtc"}' localhost:1323/signup
 	e.POST("/signup", r.SignUp())
 
@@ -59,11 +61,10 @@ func main() {
 		fluent := api.Group("/fluent")
 		{
 			fluent.Use(middleware.JWT(route.MySigningKey))
-			fluent.GET("/private", func(c echo.Context) error {
-				return c.String(http.StatusOK, "hello world!")
-			})
 			// wscat -c ws://localhost:1323/api/fluent/chats/${chatId} -H "Authorization: Bearer ${TOKEN}"
 			fluent.GET("/chats/:id", r.JoinChat(manager))
+
+			//TODO: Hacer endpoint para jalar todos los mensajes
 		}
 	}
 

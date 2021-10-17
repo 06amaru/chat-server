@@ -2,6 +2,17 @@
 
 Chat en tiempo real 
 
+### Meta actual
+
+Tener un room para chatear, encriptacion RSA, usar websockets con SSL
+
+### Pasos futuros
+
+Agregar contactos
+Tener diferentes rooms (crear id de chats, cada chat es un websocket)
+Room para solo dos personas
+Usar Casbin para autorizacion
+
 ### Configuración
 
 1. Crear una carpeta que posteriormente sera usada para la persistencia de la base de datos

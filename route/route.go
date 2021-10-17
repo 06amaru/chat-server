@@ -9,6 +9,7 @@ import (
 	"github.com/amaru0601/fluent/chat"
 	"github.com/amaru0601/fluent/ent"
 	"github.com/amaru0601/fluent/ent/user"
+	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 )
@@ -46,32 +47,30 @@ func (r *Route) JoinChat(manager map[string]*chat.Chat) echo.HandlerFunc {
 		}
 		defer ws.Close()
 
-		//TODO: conseguir user desde JWT
+		//context has a map where user is the default key for auth-header
+		authHeader := c.Get("user").(*jwt.Token)
+		username := authHeader.Claims.(jwt.MapClaims)["username"].(string)
 		userClient, err := r.db.User.
 			Query().
-			Where(user.UsernameEQ("jaoks")).
+			Where(user.UsernameEQ(username)).
 			First(context.Background())
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 
 		// conseguir el chat
 		if room, ok := manager[chatID]; ok {
 			//conectar cliente con web socket
-			//TODO: conseguir user desde JWT
-			fmt.Println("chat saved ...")
 			user := &chat.User{
-				Username: "jaoks",
+				Username: username,
 				Conn:     ws,
 				Room:     room,
 			}
 
 			room.Join <- user
 			user.Read(r.db, userClient)
-
-			//go chat.Run()
 		} else {
-			newChat := &chat.Chat{
+			newRoom := &chat.Chat{
 				Users:    make(map[string]*chat.User),
 				Messages: make(chan *chat.Message),
 				Join:     make(chan *chat.User),
@@ -79,40 +78,18 @@ func (r *Route) JoinChat(manager map[string]*chat.Chat) echo.HandlerFunc {
 				Id:       chatID,
 			}
 
+			go newRoom.Run()
+
+			manager[chatID] = newRoom
+
 			user := &chat.User{
-				Username: "amaru",
+				Username: username,
 				Conn:     ws,
-				Room:     newChat,
-			}
-			manager[chatID] = newChat
-
-			fmt.Println("Crear chat ...")
-			// crear chat en la bd
-			chatClient, err := r.db.Chat.
-				Create().
-				SetName(chatID).
-				SetType("private").
-				SetDeleted(false).
-				Save(context.Background())
-			if err != nil {
-				fmt.Println(err)
-			} else {
-				fmt.Println(chatClient)
+				Room:     newRoom,
 			}
 
-			/*
-				if err != nil {
-					return c.String(http.StatusBadRequest, err.Error())
-				}*/
-
-			go newChat.Run()
-
-			fmt.Println("joining...")
-			newChat.Join <- user
-			fmt.Println("joined user 1 ...")
+			newRoom.Join <- user
 			user.Read(r.db, userClient)
-			fmt.Println("done ...")
-
 		}
 
 		return nil

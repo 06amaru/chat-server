@@ -11,7 +11,7 @@ var (
 )
 
 type JwtClaims struct {
-	Username string
+	Username string `json:"username"`
 	jwt.StandardClaims
 }
 
