@@ -33,11 +33,6 @@ func NewRoute(client *ent.Client) *Route {
 	return &Route{db: client}
 }
 
-// originalmente el chat id puede ser null o int
-// si el chat id es null es porque el cliente esta empezando una nueva conversacion
-// se debe crear un historial del chat en la base de datos
-// si el chat id es int conseguir el historial y conseguir el chat desde el manager
-
 func (r *Route) JoinChat(manager map[string]*chat.Chat) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
