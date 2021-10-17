@@ -1,16 +1,28 @@
 package route
 
-import "github.com/golang-jwt/jwt"
+import (
+	"time"
+
+	"github.com/golang-jwt/jwt"
+)
 
 var (
 	MySigningKey = []byte("Ja0ks0nE")
 )
 
+type JwtClaims struct {
+	Username string
+	jwt.StandardClaims
+}
+
 func makeToken(user *UserSignIn) (string, error) {
-	jwtoken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"username": user.Username,
-		"password": user.Password,
-	})
+	jwtClaims := JwtClaims{
+		Username: user.Username,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+		},
+	}
+	jwtoken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtClaims)
 
 	ss, err := jwtoken.SignedString(MySigningKey)
 	return ss, err

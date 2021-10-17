@@ -46,9 +46,6 @@ func main() {
 
 	var manager = make(map[string]*chat.Chat)
 
-	// TODO: pass to authenticated routes with JWT
-	e.GET("/chats/:id", r.JoinChat(manager))
-
 	//curl -X POST -H 'Content-Type: application/json' -d '{"username":"jaoks", "password":"sdtc"}' localhost:1323/signup
 	e.POST("/signup", r.SignUp())
 
@@ -62,7 +59,11 @@ func main() {
 		fluent := api.Group("/fluent")
 		{
 			fluent.Use(middleware.JWT(route.MySigningKey))
-
+			fluent.GET("/private", func(c echo.Context) error {
+				return c.String(http.StatusOK, "hello world!")
+			})
+			// wscat -c ws://localhost:1323/api/fluent/chats/${chatId} -H "Authorization: Bearer ${TOKEN}"
+			fluent.GET("/chats/:id", r.JoinChat(manager))
 		}
 	}
 
