@@ -1,7 +1,13 @@
-import {React} from "react"
+import {React, useEffect, useRef} from "react"
 import { Input, Box } from "@chakra-ui/react"
 
 const InputMessage = () => {
+
+    const ws = useRef(null)
+
+    useEffect(() => {
+        ws.current = new WebSocket("ws://localhost:1323/chats/")
+    }, [])
 
     const onKeyUp = event => {
         if (event.charCode === 13) {
