@@ -6,7 +6,7 @@ const InputMessage = () => {
     const ws = useRef(null)
 
     useEffect(() => {
-        ws.current = new WebSocket("ws://localhost:1323/chats/")
+        ws.current = new WebSocket("ws://localhost:1323/api/plugged/chat\?jwt\=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imphb2tzIiwiZXhwIjoxNjM3MzAxMTY0fQ.CfWQDNciGotvJ0cKBmvM-KssZN0nmrTDF1FBW7l350A", )
     }, [])
 
     const onKeyUp = event => {
