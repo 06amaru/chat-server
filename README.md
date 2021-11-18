@@ -4,7 +4,7 @@ Chat en tiempo real
 
 ### Meta actual
 
-Tener un room para chatear, encriptacion RSA, usar websockets con SSL
+Tener un room para chatear, encriptacion ECIES, usar websockets con SSL
 
 ### Pasos futuros
 
