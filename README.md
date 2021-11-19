@@ -42,11 +42,3 @@ docker start jaoksdb
 ```
 go run server.go
 ```
-
-4. Pruebas de Web Socket utilizando wscat
-
-```
-wscat -c ws://localhost:1323/chats/:id
-```
-
-Reemplazar :id por un número entero
