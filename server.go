@@ -65,7 +65,7 @@ func main() {
 		fluent := api.Group("/fluent")
 		{
 			fluent.Use(middleware.JWT(route.MySigningKey))
-			// wscat -c ws://localhost:1323/api/fluent/chats -H "Authorization: Bearer ${TOKEN}"
+			// wscat -c ws://localhost:1323/api/fluent/chat -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFtYXJ1IiwiZXhwIjoxNjM3Mzg5MTM2fQ.JysM4J-00sOP84Q_bzfW5wgw3QGPksSEikFe9JOVrAw"
 			fluent.GET("/chat", r.JoinChat(manager))
 
 			//TODO: Hacer endpoint para jalar todos los mensajes

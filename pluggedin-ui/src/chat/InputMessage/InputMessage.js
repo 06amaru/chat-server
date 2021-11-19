@@ -1,23 +1,43 @@
-import {React, useEffect, useRef} from "react"
+import {React, useEffect, useRef, useState} from "react"
 import { Input, Box } from "@chakra-ui/react"
+import eccrypto from "eccrypto"
 
-const InputMessage = () => {
+const InputMessage = (props) => {
 
-    const ws = useRef(null)
+    const [message, setMessage] = useState("")
 
-    useEffect(() => {
-        ws.current = new WebSocket("ws://localhost:1323/api/plugged/chat\?jwt\=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imphb2tzIiwiZXhwIjoxNjM3MzAxMTY0fQ.CfWQDNciGotvJ0cKBmvM-KssZN0nmrTDF1FBW7l350A", )
-    }, [])
+    const onKeyUp = async(event) => {
+        if (event.charCode === 13 && message !== "") {
+            const privateKey = eccrypto.generatePrivate()
+            const publicKey = eccrypto.getPublic(privateKey)
+            const encrypted = await eccrypto.encrypt(publicKey, Buffer.from(message))
 
-    const onKeyUp = event => {
-        if (event.charCode === 13) {
-            console.log("SEND MESSAGE")
+            props.ws.current.send(
+                JSON.stringify({
+                    "message": encrypted,
+                    "pk": privateKey
+                })
+            )
+            //const decrypted = await eccrypto.decrypt(privateKey, encrypted)
+            //console.log("A?")
+            //console.log(decrypted.toString())
+            setMessage("")
         }
+    }
+
+    const handleChange = event => {
+        setMessage(event.target.value)
     }
 
     return (
         <Box>
-            <Input style={{color:"white"}} placeholder="Press enter to send your message" onKeyPress={onKeyUp}/>
+            <Input 
+                style={{color:"white"}} 
+                value={message}
+                placeholder="Press enter to send your message" 
+                onKeyPress={onKeyUp}
+                onChange={handleChange}
+                />
         </Box>
     )
 }
