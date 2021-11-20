@@ -1,4 +1,4 @@
-import {React, useEffect, useRef, useState} from "react"
+import {React, useState} from "react"
 import { Input, Box } from "@chakra-ui/react"
 import eccrypto from "eccrypto"
 
@@ -10,6 +10,7 @@ const InputMessage = (props) => {
         if (event.charCode === 13 && message !== "") {
             const privateKey = eccrypto.generatePrivate()
             const publicKey = eccrypto.getPublic(privateKey)
+            //TODO Conseguir la llave publica de Alice (RECEPTOR)
             const encrypted = await eccrypto.encrypt(publicKey, Buffer.from(message))
 
             props.ws.current.send(
