@@ -17,9 +17,13 @@ type User struct {
 }
 
 func (u *User) Read(client *ent.Client, userClient *ent.User) {
+	defer func() {
+		//necesitamos avisar al Chat que user se fue
+		u.Room.Leave <- u
+	}()
 	for {
 		if _, message, err := u.Conn.ReadMessage(); err != nil {
-			log.Println("Error on read message: ", err.Error())
+			log.Println("Error on read message =>\n", err.Error())
 			break
 		} else {
 			fmt.Println("reading ...")

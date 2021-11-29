@@ -37,8 +37,9 @@ func (r *Route) JoinChat(manager map[string]*chat.Chat) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 		chatID := c.Param("id")
+
 		if err != nil {
-			log.Fatalln("Error on websocket connection:", err.Error())
+			log.Println("Error on websocket connection:", err.Error())
 		}
 		defer ws.Close()
 
@@ -61,7 +62,6 @@ func (r *Route) JoinChat(manager map[string]*chat.Chat) echo.HandlerFunc {
 				Conn:     ws,
 				Room:     room,
 			}
-
 			room.Join <- user
 			user.Read(r.db, userClient)
 		} else {
@@ -86,7 +86,6 @@ func (r *Route) JoinChat(manager map[string]*chat.Chat) echo.HandlerFunc {
 			newRoom.Join <- user
 			user.Read(r.db, userClient)
 		}
-
 		return nil
 	}
 }
@@ -122,7 +121,7 @@ func (r *Route) SignIn() echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, err)
 		}
 
-		return c.String(http.StatusOK, jwtoken)
+		return c.JSON(http.StatusOK, jwtoken)
 	}
 }
 

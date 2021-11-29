@@ -1,16 +1,13 @@
 package main
 
 import (
-	"errors"
-	"fmt"
 	"log"
 	"net/http"
-	"reflect"
 
 	"github.com/amaru0601/fluent/chat"
 	"github.com/amaru0601/fluent/db"
 	"github.com/amaru0601/fluent/route"
-	"github.com/golang-jwt/jwt"
+	"github.com/amaru0601/fluent/security"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -30,7 +27,7 @@ var (
 func main() {
 	// Echo instance
 	e := echo.New()
-
+	e.Use(middleware.CORS())
 	// Ent client
 	entClient, err := db.GetClient()
 	if err != nil {
@@ -66,81 +63,17 @@ func main() {
 		{
 			fluent.Use(middleware.JWT(route.MySigningKey))
 			// wscat -c ws://localhost:1323/api/fluent/chat -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFtYXJ1IiwiZXhwIjoxNjM3Mzg5MTM2fQ.JysM4J-00sOP84Q_bzfW5wgw3QGPksSEikFe9JOVrAw"
-			fluent.GET("/chat", r.JoinChat(manager))
+			//fluent.GET("/chat", r.JoinChat(manager))
+
+			fluent.GET("/verify", func(c echo.Context) error {
+				return c.String(http.StatusAccepted, "ok")
+			})
 
 			//TODO: Hacer endpoint para jalar todos los mensajes
 		}
 		plugged := api.Group("/plugged")
 		{
-
-			config := middleware.DefaultJWTConfig
-
-			plugged.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-
-				return func(c echo.Context) error {
-					param := c.QueryParam("jwt")
-					println(param)
-					config.SigningKey = route.MySigningKey
-
-					defaultKeyFunc := func(t *jwt.Token) (interface{}, error) {
-						// Check the signing method
-						if t.Method.Alg() != config.SigningMethod {
-							return nil, fmt.Errorf("unexpected jwt signing method=%v", t.Header["alg"])
-						}
-						if len(config.SigningKeys) > 0 {
-							if kid, ok := t.Header["kid"].(string); ok {
-								if key, ok := config.SigningKeys[kid]; ok {
-									return key, nil
-								}
-							}
-							return nil, fmt.Errorf("unexpected jwt key id=%v", t.Header["kid"])
-						}
-
-						return config.SigningKey, nil
-					}
-
-					config.KeyFunc = defaultKeyFunc
-
-					token, err := func(auth string, c echo.Context) (interface{}, error) {
-						token_ := new(jwt.Token)
-						var err error
-						if _, ok := config.Claims.(jwt.MapClaims); ok {
-							token_, err = jwt.Parse(auth, config.KeyFunc)
-						} else {
-							t := reflect.ValueOf(config.Claims).Type().Elem()
-							claims := reflect.New(t).Interface().(jwt.Claims)
-							token_, err = jwt.ParseWithClaims(auth, claims, config.KeyFunc)
-						}
-						if err != nil {
-							return nil, err
-						}
-						if !token_.Valid {
-							return nil, errors.New("invalid token")
-						}
-						return token_, nil
-					}(param, c)
-
-					if err == nil {
-						// Store user information from token into context.
-						c.Set(config.ContextKey, token)
-						if config.SuccessHandler != nil {
-							config.SuccessHandler(c)
-						}
-						return next(c)
-					}
-					if config.ErrorHandler != nil {
-						return config.ErrorHandler(err)
-					}
-					if config.ErrorHandlerWithContext != nil {
-						return config.ErrorHandlerWithContext(err, c)
-					}
-					return &echo.HTTPError{
-						Code:     middleware.ErrJWTInvalid.Code,
-						Message:  middleware.ErrJWTInvalid.Message,
-						Internal: err,
-					}
-				}
-			})
+			plugged.Use(security.CustomMiddleware)
 			plugged.GET("/chat", r.JoinChat(manager))
 		}
 	}
