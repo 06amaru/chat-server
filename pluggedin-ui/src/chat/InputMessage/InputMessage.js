@@ -33,7 +33,6 @@ const InputMessage = (props) => {
     return (
         <Box>
             <Input 
-                style={{color:"white"}} 
                 value={message}
                 placeholder="Press enter to send your message" 
                 onKeyPress={onKeyUp}

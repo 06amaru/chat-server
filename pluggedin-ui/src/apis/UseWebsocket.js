@@ -8,7 +8,8 @@ const UseWebsocket = (url) => {
     const ws = useRef(null)
 
     useEffect(() => {
-        ws.current = new WebSocket(url)
+        const jwt = localStorage.getItem("jwt")
+        ws.current = new WebSocket(url + "?jwt="+jwt)
         ws.current.onmessage = async (e) => {
             const data = JSON.parse(e.data)
             console.log(data.sender)
@@ -37,7 +38,7 @@ const UseWebsocket = (url) => {
             ws.current.close()
             ws.current = null
         }
-    }, [])
+    }, [url])
 
     return {
         ws,
