@@ -1,7 +1,7 @@
 import { Container, Box } from '@chakra-ui/layout';
 import { Button } from "@chakra-ui/button"
 import React, { useState } from 'react'
-import { useAuth } from '../auth/UseAuth';
+import { useAuth } from '../../auth/UseAuth';
 import { Input } from '@chakra-ui/input';
 import { useNavigate } from 'react-router';
 
