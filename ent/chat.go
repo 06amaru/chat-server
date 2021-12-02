@@ -4,10 +4,10 @@ package ent
 
 import (
 	"fmt"
-	"github.com/amaru0601/fluent/ent/chat"
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/amaru0601/fluent/ent/chat"
 )
 
 // Chat is the model entity for the Chat schema.
@@ -30,8 +30,8 @@ type Chat struct {
 type ChatEdges struct {
 	// Members holds the value of the members edge.
 	Members []*User `json:"members,omitempty"`
-	// Has holds the value of the has edge.
-	Has []*Message `json:"has,omitempty"`
+	// Messages holds the value of the messages edge.
+	Messages []*Message `json:"messages,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
@@ -46,13 +46,13 @@ func (e ChatEdges) MembersOrErr() ([]*User, error) {
 	return nil, &NotLoadedError{edge: "members"}
 }
 
-// HasOrErr returns the Has value or an error if the edge
+// MessagesOrErr returns the Messages value or an error if the edge
 // was not loaded in eager-loading.
-func (e ChatEdges) HasOrErr() ([]*Message, error) {
+func (e ChatEdges) MessagesOrErr() ([]*Message, error) {
 	if e.loadedTypes[1] {
-		return e.Has, nil
+		return e.Messages, nil
 	}
-	return nil, &NotLoadedError{edge: "has"}
+	return nil, &NotLoadedError{edge: "messages"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -115,9 +115,9 @@ func (c *Chat) QueryMembers() *UserQuery {
 	return (&ChatClient{config: c.config}).QueryMembers(c)
 }
 
-// QueryHas queries the "has" edge of the Chat entity.
-func (c *Chat) QueryHas() *MessageQuery {
-	return (&ChatClient{config: c.config}).QueryHas(c)
+// QueryMessages queries the "messages" edge of the Chat entity.
+func (c *Chat) QueryMessages() *MessageQuery {
+	return (&ChatClient{config: c.config}).QueryMessages(c)
 }
 
 // Update returns a builder for updating this Chat.

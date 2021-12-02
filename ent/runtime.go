@@ -3,11 +3,12 @@
 package ent
 
 import (
+	"time"
+
 	"github.com/amaru0601/fluent/ent/chat"
 	"github.com/amaru0601/fluent/ent/message"
 	"github.com/amaru0601/fluent/ent/schema"
 	"github.com/amaru0601/fluent/ent/user"
-	"time"
 )
 
 // The init function reads all schema descriptors with runtime code

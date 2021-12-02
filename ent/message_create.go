@@ -6,13 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/amaru0601/fluent/ent/chat"
-	"github.com/amaru0601/fluent/ent/message"
-	"github.com/amaru0601/fluent/ent/user"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/amaru0601/fluent/ent/chat"
+	"github.com/amaru0601/fluent/ent/message"
+	"github.com/amaru0601/fluent/ent/user"
 )
 
 // MessageCreate is the builder for creating a Message entity.

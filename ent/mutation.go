@@ -5,12 +5,13 @@ package ent
 import (
 	"context"
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/amaru0601/fluent/ent/chat"
 	"github.com/amaru0601/fluent/ent/message"
 	"github.com/amaru0601/fluent/ent/predicate"
 	"github.com/amaru0601/fluent/ent/user"
-	"sync"
-	"time"
 
 	"entgo.io/ent"
 )
@@ -32,22 +33,22 @@ const (
 // ChatMutation represents an operation that mutates the Chat nodes in the graph.
 type ChatMutation struct {
 	config
-	op             Op
-	typ            string
-	id             *int
-	name           *string
-	_type          *chat.Type
-	deleted        *bool
-	clearedFields  map[string]struct{}
-	members        map[int]struct{}
-	removedmembers map[int]struct{}
-	clearedmembers bool
-	has            map[int]struct{}
-	removedhas     map[int]struct{}
-	clearedhas     bool
-	done           bool
-	oldValue       func(context.Context) (*Chat, error)
-	predicates     []predicate.Chat
+	op              Op
+	typ             string
+	id              *int
+	name            *string
+	_type           *chat.Type
+	deleted         *bool
+	clearedFields   map[string]struct{}
+	members         map[int]struct{}
+	removedmembers  map[int]struct{}
+	clearedmembers  bool
+	messages        map[int]struct{}
+	removedmessages map[int]struct{}
+	clearedmessages bool
+	done            bool
+	oldValue        func(context.Context) (*Chat, error)
+	predicates      []predicate.Chat
 }
 
 var _ ent.Mutation = (*ChatMutation)(nil)
@@ -291,58 +292,58 @@ func (m *ChatMutation) ResetMembers() {
 	m.removedmembers = nil
 }
 
-// AddHaIDs adds the "has" edge to the Message entity by ids.
-func (m *ChatMutation) AddHaIDs(ids ...int) {
-	if m.has == nil {
-		m.has = make(map[int]struct{})
+// AddMessageIDs adds the "messages" edge to the Message entity by ids.
+func (m *ChatMutation) AddMessageIDs(ids ...int) {
+	if m.messages == nil {
+		m.messages = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.has[ids[i]] = struct{}{}
+		m.messages[ids[i]] = struct{}{}
 	}
 }
 
-// ClearHas clears the "has" edge to the Message entity.
-func (m *ChatMutation) ClearHas() {
-	m.clearedhas = true
+// ClearMessages clears the "messages" edge to the Message entity.
+func (m *ChatMutation) ClearMessages() {
+	m.clearedmessages = true
 }
 
-// HasCleared reports if the "has" edge to the Message entity was cleared.
-func (m *ChatMutation) HasCleared() bool {
-	return m.clearedhas
+// MessagesCleared reports if the "messages" edge to the Message entity was cleared.
+func (m *ChatMutation) MessagesCleared() bool {
+	return m.clearedmessages
 }
 
-// RemoveHaIDs removes the "has" edge to the Message entity by IDs.
-func (m *ChatMutation) RemoveHaIDs(ids ...int) {
-	if m.removedhas == nil {
-		m.removedhas = make(map[int]struct{})
+// RemoveMessageIDs removes the "messages" edge to the Message entity by IDs.
+func (m *ChatMutation) RemoveMessageIDs(ids ...int) {
+	if m.removedmessages == nil {
+		m.removedmessages = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.has, ids[i])
-		m.removedhas[ids[i]] = struct{}{}
+		delete(m.messages, ids[i])
+		m.removedmessages[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedHas returns the removed IDs of the "has" edge to the Message entity.
-func (m *ChatMutation) RemovedHasIDs() (ids []int) {
-	for id := range m.removedhas {
+// RemovedMessages returns the removed IDs of the "messages" edge to the Message entity.
+func (m *ChatMutation) RemovedMessagesIDs() (ids []int) {
+	for id := range m.removedmessages {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// HasIDs returns the "has" edge IDs in the mutation.
-func (m *ChatMutation) HasIDs() (ids []int) {
-	for id := range m.has {
+// MessagesIDs returns the "messages" edge IDs in the mutation.
+func (m *ChatMutation) MessagesIDs() (ids []int) {
+	for id := range m.messages {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetHas resets all changes to the "has" edge.
-func (m *ChatMutation) ResetHas() {
-	m.has = nil
-	m.clearedhas = false
-	m.removedhas = nil
+// ResetMessages resets all changes to the "messages" edge.
+func (m *ChatMutation) ResetMessages() {
+	m.messages = nil
+	m.clearedmessages = false
+	m.removedmessages = nil
 }
 
 // Where appends a list predicates to the ChatMutation builder.
@@ -501,8 +502,8 @@ func (m *ChatMutation) AddedEdges() []string {
 	if m.members != nil {
 		edges = append(edges, chat.EdgeMembers)
 	}
-	if m.has != nil {
-		edges = append(edges, chat.EdgeHas)
+	if m.messages != nil {
+		edges = append(edges, chat.EdgeMessages)
 	}
 	return edges
 }
@@ -517,9 +518,9 @@ func (m *ChatMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case chat.EdgeHas:
-		ids := make([]ent.Value, 0, len(m.has))
-		for id := range m.has {
+	case chat.EdgeMessages:
+		ids := make([]ent.Value, 0, len(m.messages))
+		for id := range m.messages {
 			ids = append(ids, id)
 		}
 		return ids
@@ -533,8 +534,8 @@ func (m *ChatMutation) RemovedEdges() []string {
 	if m.removedmembers != nil {
 		edges = append(edges, chat.EdgeMembers)
 	}
-	if m.removedhas != nil {
-		edges = append(edges, chat.EdgeHas)
+	if m.removedmessages != nil {
+		edges = append(edges, chat.EdgeMessages)
 	}
 	return edges
 }
@@ -549,9 +550,9 @@ func (m *ChatMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case chat.EdgeHas:
-		ids := make([]ent.Value, 0, len(m.removedhas))
-		for id := range m.removedhas {
+	case chat.EdgeMessages:
+		ids := make([]ent.Value, 0, len(m.removedmessages))
+		for id := range m.removedmessages {
 			ids = append(ids, id)
 		}
 		return ids
@@ -565,8 +566,8 @@ func (m *ChatMutation) ClearedEdges() []string {
 	if m.clearedmembers {
 		edges = append(edges, chat.EdgeMembers)
 	}
-	if m.clearedhas {
-		edges = append(edges, chat.EdgeHas)
+	if m.clearedmessages {
+		edges = append(edges, chat.EdgeMessages)
 	}
 	return edges
 }
@@ -577,8 +578,8 @@ func (m *ChatMutation) EdgeCleared(name string) bool {
 	switch name {
 	case chat.EdgeMembers:
 		return m.clearedmembers
-	case chat.EdgeHas:
-		return m.clearedhas
+	case chat.EdgeMessages:
+		return m.clearedmessages
 	}
 	return false
 }
@@ -598,8 +599,8 @@ func (m *ChatMutation) ResetEdge(name string) error {
 	case chat.EdgeMembers:
 		m.ResetMembers()
 		return nil
-	case chat.EdgeHas:
-		m.ResetHas()
+	case chat.EdgeMessages:
+		m.ResetMessages()
 		return nil
 	}
 	return fmt.Errorf("unknown Chat edge %s", name)

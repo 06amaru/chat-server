@@ -4,11 +4,11 @@ package ent
 
 import (
 	"fmt"
-	"github.com/amaru0601/fluent/ent/user"
 	"strings"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/amaru0601/fluent/ent/user"
 )
 
 // User is the model entity for the User schema.

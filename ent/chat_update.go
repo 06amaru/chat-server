@@ -5,14 +5,14 @@ package ent
 import (
 	"context"
 	"fmt"
-	"github.com/amaru0601/fluent/ent/chat"
-	"github.com/amaru0601/fluent/ent/message"
-	"github.com/amaru0601/fluent/ent/predicate"
-	"github.com/amaru0601/fluent/ent/user"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/amaru0601/fluent/ent/chat"
+	"github.com/amaru0601/fluent/ent/message"
+	"github.com/amaru0601/fluent/ent/predicate"
+	"github.com/amaru0601/fluent/ent/user"
 )
 
 // ChatUpdate is the builder for updating Chat entities.
@@ -69,19 +69,19 @@ func (cu *ChatUpdate) AddMembers(u ...*User) *ChatUpdate {
 	return cu.AddMemberIDs(ids...)
 }
 
-// AddHaIDs adds the "has" edge to the Message entity by IDs.
-func (cu *ChatUpdate) AddHaIDs(ids ...int) *ChatUpdate {
-	cu.mutation.AddHaIDs(ids...)
+// AddMessageIDs adds the "messages" edge to the Message entity by IDs.
+func (cu *ChatUpdate) AddMessageIDs(ids ...int) *ChatUpdate {
+	cu.mutation.AddMessageIDs(ids...)
 	return cu
 }
 
-// AddHas adds the "has" edges to the Message entity.
-func (cu *ChatUpdate) AddHas(m ...*Message) *ChatUpdate {
+// AddMessages adds the "messages" edges to the Message entity.
+func (cu *ChatUpdate) AddMessages(m ...*Message) *ChatUpdate {
 	ids := make([]int, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
-	return cu.AddHaIDs(ids...)
+	return cu.AddMessageIDs(ids...)
 }
 
 // Mutation returns the ChatMutation object of the builder.
@@ -110,25 +110,25 @@ func (cu *ChatUpdate) RemoveMembers(u ...*User) *ChatUpdate {
 	return cu.RemoveMemberIDs(ids...)
 }
 
-// ClearHas clears all "has" edges to the Message entity.
-func (cu *ChatUpdate) ClearHas() *ChatUpdate {
-	cu.mutation.ClearHas()
+// ClearMessages clears all "messages" edges to the Message entity.
+func (cu *ChatUpdate) ClearMessages() *ChatUpdate {
+	cu.mutation.ClearMessages()
 	return cu
 }
 
-// RemoveHaIDs removes the "has" edge to Message entities by IDs.
-func (cu *ChatUpdate) RemoveHaIDs(ids ...int) *ChatUpdate {
-	cu.mutation.RemoveHaIDs(ids...)
+// RemoveMessageIDs removes the "messages" edge to Message entities by IDs.
+func (cu *ChatUpdate) RemoveMessageIDs(ids ...int) *ChatUpdate {
+	cu.mutation.RemoveMessageIDs(ids...)
 	return cu
 }
 
-// RemoveHas removes "has" edges to Message entities.
-func (cu *ChatUpdate) RemoveHas(m ...*Message) *ChatUpdate {
+// RemoveMessages removes "messages" edges to Message entities.
+func (cu *ChatUpdate) RemoveMessages(m ...*Message) *ChatUpdate {
 	ids := make([]int, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
-	return cu.RemoveHaIDs(ids...)
+	return cu.RemoveMessageIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -294,12 +294,12 @@ func (cu *ChatUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cu.mutation.HasCleared() {
+	if cu.mutation.MessagesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   chat.HasTable,
-			Columns: chat.HasPrimaryKey,
+			Table:   chat.MessagesTable,
+			Columns: chat.MessagesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -310,12 +310,12 @@ func (cu *ChatUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.RemovedHasIDs(); len(nodes) > 0 && !cu.mutation.HasCleared() {
+	if nodes := cu.mutation.RemovedMessagesIDs(); len(nodes) > 0 && !cu.mutation.MessagesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   chat.HasTable,
-			Columns: chat.HasPrimaryKey,
+			Table:   chat.MessagesTable,
+			Columns: chat.MessagesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -329,12 +329,12 @@ func (cu *ChatUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.HasIDs(); len(nodes) > 0 {
+	if nodes := cu.mutation.MessagesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   chat.HasTable,
-			Columns: chat.HasPrimaryKey,
+			Table:   chat.MessagesTable,
+			Columns: chat.MessagesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -408,19 +408,19 @@ func (cuo *ChatUpdateOne) AddMembers(u ...*User) *ChatUpdateOne {
 	return cuo.AddMemberIDs(ids...)
 }
 
-// AddHaIDs adds the "has" edge to the Message entity by IDs.
-func (cuo *ChatUpdateOne) AddHaIDs(ids ...int) *ChatUpdateOne {
-	cuo.mutation.AddHaIDs(ids...)
+// AddMessageIDs adds the "messages" edge to the Message entity by IDs.
+func (cuo *ChatUpdateOne) AddMessageIDs(ids ...int) *ChatUpdateOne {
+	cuo.mutation.AddMessageIDs(ids...)
 	return cuo
 }
 
-// AddHas adds the "has" edges to the Message entity.
-func (cuo *ChatUpdateOne) AddHas(m ...*Message) *ChatUpdateOne {
+// AddMessages adds the "messages" edges to the Message entity.
+func (cuo *ChatUpdateOne) AddMessages(m ...*Message) *ChatUpdateOne {
 	ids := make([]int, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
-	return cuo.AddHaIDs(ids...)
+	return cuo.AddMessageIDs(ids...)
 }
 
 // Mutation returns the ChatMutation object of the builder.
@@ -449,25 +449,25 @@ func (cuo *ChatUpdateOne) RemoveMembers(u ...*User) *ChatUpdateOne {
 	return cuo.RemoveMemberIDs(ids...)
 }
 
-// ClearHas clears all "has" edges to the Message entity.
-func (cuo *ChatUpdateOne) ClearHas() *ChatUpdateOne {
-	cuo.mutation.ClearHas()
+// ClearMessages clears all "messages" edges to the Message entity.
+func (cuo *ChatUpdateOne) ClearMessages() *ChatUpdateOne {
+	cuo.mutation.ClearMessages()
 	return cuo
 }
 
-// RemoveHaIDs removes the "has" edge to Message entities by IDs.
-func (cuo *ChatUpdateOne) RemoveHaIDs(ids ...int) *ChatUpdateOne {
-	cuo.mutation.RemoveHaIDs(ids...)
+// RemoveMessageIDs removes the "messages" edge to Message entities by IDs.
+func (cuo *ChatUpdateOne) RemoveMessageIDs(ids ...int) *ChatUpdateOne {
+	cuo.mutation.RemoveMessageIDs(ids...)
 	return cuo
 }
 
-// RemoveHas removes "has" edges to Message entities.
-func (cuo *ChatUpdateOne) RemoveHas(m ...*Message) *ChatUpdateOne {
+// RemoveMessages removes "messages" edges to Message entities.
+func (cuo *ChatUpdateOne) RemoveMessages(m ...*Message) *ChatUpdateOne {
 	ids := make([]int, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
-	return cuo.RemoveHaIDs(ids...)
+	return cuo.RemoveMessageIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -657,12 +657,12 @@ func (cuo *ChatUpdateOne) sqlSave(ctx context.Context) (_node *Chat, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cuo.mutation.HasCleared() {
+	if cuo.mutation.MessagesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   chat.HasTable,
-			Columns: chat.HasPrimaryKey,
+			Table:   chat.MessagesTable,
+			Columns: chat.MessagesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -673,12 +673,12 @@ func (cuo *ChatUpdateOne) sqlSave(ctx context.Context) (_node *Chat, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.RemovedHasIDs(); len(nodes) > 0 && !cuo.mutation.HasCleared() {
+	if nodes := cuo.mutation.RemovedMessagesIDs(); len(nodes) > 0 && !cuo.mutation.MessagesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   chat.HasTable,
-			Columns: chat.HasPrimaryKey,
+			Table:   chat.MessagesTable,
+			Columns: chat.MessagesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -692,12 +692,12 @@ func (cuo *ChatUpdateOne) sqlSave(ctx context.Context) (_node *Chat, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.HasIDs(); len(nodes) > 0 {
+	if nodes := cuo.mutation.MessagesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   chat.HasTable,
-			Columns: chat.HasPrimaryKey,
+			Table:   chat.MessagesTable,
+			Columns: chat.MessagesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

@@ -5,12 +5,12 @@ package ent
 import (
 	"errors"
 	"fmt"
-	"github.com/amaru0601/fluent/ent/chat"
-	"github.com/amaru0601/fluent/ent/message"
-	"github.com/amaru0601/fluent/ent/user"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/amaru0601/fluent/ent/chat"
+	"github.com/amaru0601/fluent/ent/message"
+	"github.com/amaru0601/fluent/ent/user"
 )
 
 // ent aliases to avoid import conflicts in user's code.

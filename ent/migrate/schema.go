@@ -80,26 +80,26 @@ var (
 			},
 		},
 	}
-	// ChatHasColumns holds the columns for the "chat_has" table.
-	ChatHasColumns = []*schema.Column{
+	// ChatMessagesColumns holds the columns for the "chat_messages" table.
+	ChatMessagesColumns = []*schema.Column{
 		{Name: "chat_id", Type: field.TypeInt},
 		{Name: "message_id", Type: field.TypeInt},
 	}
-	// ChatHasTable holds the schema information for the "chat_has" table.
-	ChatHasTable = &schema.Table{
-		Name:       "chat_has",
-		Columns:    ChatHasColumns,
-		PrimaryKey: []*schema.Column{ChatHasColumns[0], ChatHasColumns[1]},
+	// ChatMessagesTable holds the schema information for the "chat_messages" table.
+	ChatMessagesTable = &schema.Table{
+		Name:       "chat_messages",
+		Columns:    ChatMessagesColumns,
+		PrimaryKey: []*schema.Column{ChatMessagesColumns[0], ChatMessagesColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "chat_has_chat_id",
-				Columns:    []*schema.Column{ChatHasColumns[0]},
+				Symbol:     "chat_messages_chat_id",
+				Columns:    []*schema.Column{ChatMessagesColumns[0]},
 				RefColumns: []*schema.Column{ChatsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "chat_has_message_id",
-				Columns:    []*schema.Column{ChatHasColumns[1]},
+				Symbol:     "chat_messages_message_id",
+				Columns:    []*schema.Column{ChatMessagesColumns[1]},
 				RefColumns: []*schema.Column{MessagesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -111,7 +111,7 @@ var (
 		MessagesTable,
 		UsersTable,
 		ChatMembersTable,
-		ChatHasTable,
+		ChatMessagesTable,
 	}
 )
 
@@ -119,6 +119,6 @@ func init() {
 	MessagesTable.ForeignKeys[0].RefTable = UsersTable
 	ChatMembersTable.ForeignKeys[0].RefTable = ChatsTable
 	ChatMembersTable.ForeignKeys[1].RefTable = UsersTable
-	ChatHasTable.ForeignKeys[0].RefTable = ChatsTable
-	ChatHasTable.ForeignKeys[1].RefTable = MessagesTable
+	ChatMessagesTable.ForeignKeys[0].RefTable = ChatsTable
+	ChatMessagesTable.ForeignKeys[1].RefTable = MessagesTable
 }

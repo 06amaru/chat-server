@@ -31,6 +31,6 @@ func (Message) Edges() []ent.Edge {
 			// setting the edge to unique, ensure
 			// that a message can have only one from.
 			Unique(),
-		edge.From("where", Chat.Type).Ref("has"),
+		edge.From("where", Chat.Type).Ref("messages"),
 	}
 }

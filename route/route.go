@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/amaru0601/fluent/chat"
 	"github.com/amaru0601/fluent/ent"
@@ -33,11 +34,11 @@ func NewRoute(client *ent.Client) *Route {
 	return &Route{db: client}
 }
 
-func (r *Route) JoinChat(manager map[string]*chat.Chat) echo.HandlerFunc {
+func (r *Route) JoinChat(manager map[int]*chat.Chat) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
-		chatID := c.Param("id")
-
+		chatID, _ := strconv.Atoi(c.Param("id"))
+		receiverID, _ := strconv.Atoi(c.Param("receiver"))
 		if err != nil {
 			log.Println("Error on websocket connection:", err.Error())
 		}
@@ -74,8 +75,9 @@ func (r *Route) JoinChat(manager map[string]*chat.Chat) echo.HandlerFunc {
 			}
 
 			go newRoom.Run()
+			chatEnt, _ := r.db.Chat.Create().AddMemberIDs(receiverID, userClient.ID).Save(context.Background())
 
-			manager[chatID] = newRoom
+			manager[chatEnt.ID] = newRoom
 
 			user := &chat.User{
 				Username: username,

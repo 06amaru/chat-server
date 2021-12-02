@@ -6,12 +6,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/amaru0601/fluent/ent/chat"
-	"github.com/amaru0601/fluent/ent/message"
-	"github.com/amaru0601/fluent/ent/user"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/amaru0601/fluent/ent/chat"
+	"github.com/amaru0601/fluent/ent/message"
+	"github.com/amaru0601/fluent/ent/user"
 )
 
 // ChatCreate is the builder for creating a Chat entity.
@@ -62,19 +62,19 @@ func (cc *ChatCreate) AddMembers(u ...*User) *ChatCreate {
 	return cc.AddMemberIDs(ids...)
 }
 
-// AddHaIDs adds the "has" edge to the Message entity by IDs.
-func (cc *ChatCreate) AddHaIDs(ids ...int) *ChatCreate {
-	cc.mutation.AddHaIDs(ids...)
+// AddMessageIDs adds the "messages" edge to the Message entity by IDs.
+func (cc *ChatCreate) AddMessageIDs(ids ...int) *ChatCreate {
+	cc.mutation.AddMessageIDs(ids...)
 	return cc
 }
 
-// AddHas adds the "has" edges to the Message entity.
-func (cc *ChatCreate) AddHas(m ...*Message) *ChatCreate {
+// AddMessages adds the "messages" edges to the Message entity.
+func (cc *ChatCreate) AddMessages(m ...*Message) *ChatCreate {
 	ids := make([]int, len(m))
 	for i := range m {
 		ids[i] = m[i].ID
 	}
-	return cc.AddHaIDs(ids...)
+	return cc.AddMessageIDs(ids...)
 }
 
 // Mutation returns the ChatMutation object of the builder.
@@ -240,12 +240,12 @@ func (cc *ChatCreate) createSpec() (*Chat, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.HasIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.MessagesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   chat.HasTable,
-			Columns: chat.HasPrimaryKey,
+			Table:   chat.MessagesTable,
+			Columns: chat.MessagesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

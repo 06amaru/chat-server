@@ -1,13 +1,16 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 
 	"github.com/amaru0601/fluent/chat"
 	"github.com/amaru0601/fluent/db"
+	"github.com/amaru0601/fluent/ent/user"
 	"github.com/amaru0601/fluent/route"
 	"github.com/amaru0601/fluent/security"
+	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -46,7 +49,10 @@ func main() {
 	})
 
 	// encargado de almacenar las direcciones de memoria de los chats para luego poder conectarse
-	var manager = make(map[string]*chat.Chat)
+	var manager = make(map[int]*chat.Chat)
+
+	// encargado de almacenar las llaves privadas de los usuarios
+	var keeper = make(map[string]string)
 
 	//TODO HASH PASSWORD
 	//curl -X POST -H 'Content-Type: application/json' -d '{"username":"jaoks", "password":"sdtc"}' localhost:1323/signup
@@ -68,8 +74,36 @@ func main() {
 			fluent.GET("/verify", func(c echo.Context) error {
 				return c.String(http.StatusAccepted, "ok")
 			})
+			fluent.POST("/secret-key", func(c echo.Context) error {
+				privateKey := c.QueryParam("pk")
+				//context has a map where user is the default key for auth-header
+				authHeader := c.Get("user").(*jwt.Token)
+				username := authHeader.Claims.(jwt.MapClaims)["username"].(string)
+				keeper[username] = privateKey
+				return c.String(http.StatusAccepted, "ok")
+			})
 
-			//TODO: Hacer endpoint para jalar todos los mensajes
+			//consigue todos los chats
+			fluent.GET("/chats", func(c echo.Context) error {
+				//context has a map where user is the default key for auth-header
+				authHeader := c.Get("user").(*jwt.Token)
+				username := authHeader.Claims.(jwt.MapClaims)["username"].(string)
+				entClient, err := db.GetClient()
+
+				if err != nil {
+					return c.String(http.StatusInternalServerError, "no se pudo conectar a la base de datos")
+				}
+
+				user, _ := entClient.User.Query().Where(
+					user.UsernameEQ(username),
+				).First(context.Background())
+
+				chats, _ := user.QueryChats().All(context.Background())
+
+				return c.JSON(http.StatusOK, chats)
+			})
+
+			//TODO: Hacer endpoint para jalar todos los mensajes -- CHALLENGE: almacenar las KEYS de esos mensajes
 		}
 		plugged := api.Group("/plugged")
 		{
