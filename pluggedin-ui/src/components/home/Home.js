@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import { Grid, GridItem } from '@chakra-ui/react'
 import { Box, VStack, Button } from '@chakra-ui/react'
 import { useDisclosure } from '@chakra-ui/hooks'
@@ -13,6 +13,25 @@ const Home = () => {
     const cancelRef = useRef()
     const [chat, setChat] = useState(null)
     const [receiverUsername, setReceiverUsername] = useState("")
+
+    useEffect(() => {
+        async function getChats() {
+            const jwt = localStorage.getItem("jwt")
+            const response = await fetch('http://127.0.0.1:1323/api/fluent/chats', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer '+jwt
+                }
+            })
+            if (response.status === 200) {
+                let data = await response.json()
+                console.log(...data)
+                setChats(data)
+            }
+        }
+
+        getChats()
+    }, [])
 
     const handleClick = async (i) => {
         console.log(i)
@@ -79,7 +98,7 @@ const Home = () => {
                     {
                         chats.length > 0 ? chats.map((c, i) => 
                             <Box key={i} bg="green" width="100%" textAlign="center" onClick={() => handleClick(i)}>
-                                {c.receiver}
+                                {c.id}
                             </Box>)
                             : <Box> No tienes ningun chat</Box>
                     }

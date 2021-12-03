@@ -6,7 +6,7 @@ import Messages from "./Messages/Messages";
 
 const Chat = (props) => {
     console.log(props)
-    const chatId = props.chat !== "nuevo chat" ? props.chat.ID : null
+    const chatId = props.chat !== "nuevo chat" ? props.chat.id : null
     const {ws, messages} = UseWebsocket("ws://localhost:1323/api/plugged/chat", chatId, props.receiver)
     
     return (

@@ -46,12 +46,17 @@ func (r *Route) JoinChat(manager map[int]*chat.Chat) echo.HandlerFunc {
 
 		receiverUsername := c.QueryParam("receiver") // se utiliza solo cuando se va crear un chat
 
-		receiverClient, err := r.db.User.
-			Query().
-			Where(user.UsernameEQ(receiverUsername)).
-			First(context.Background())
-		if err != nil {
-			log.Println(err)
+		var receiverID = -1
+		if receiverUsername != "" {
+			receiverClient, err := r.db.User.
+				Query().
+				Where(user.UsernameEQ(receiverUsername)).
+				First(context.Background())
+			if err != nil {
+				log.Println(err)
+			} else {
+				receiverID = receiverClient.ID
+			}
 		}
 
 		//context has a map where user is the default key for auth-header
@@ -83,18 +88,26 @@ func (r *Route) JoinChat(manager map[int]*chat.Chat) echo.HandlerFunc {
 				Leave:    make(chan *chat.User),
 				Id:       chatID,
 			}
+			if receiverID != -1 {
+				//solo debo crear un chat cuando el receiverID sea diferente a -1
+				//en caso el id sea -1 significa que el front ya tiene registrado este chat y solo
+				//falta crear el canal no es necesario crear el chat
+				//TODO: verificar si el chat por crear ya existe
+				chatEnt, err := r.db.Chat.Create().
+					SetName("noname").
+					SetType("public").
+					AddMemberIDs(receiverID, userClient.ID).Save(context.Background())
+				if err != nil {
+					log.Println("Error al crear chat en bd")
+					log.Println(err)
+				}
 
-			go newRoom.Run()
-			chatEnt, err := r.db.Chat.Create().
-				SetName("noname").
-				SetType("public").
-				AddMemberIDs(receiverClient.ID, userClient.ID).Save(context.Background())
-			if err != nil {
-				log.Println("Error al crear chat en bd")
-				log.Println(err)
+				manager[chatEnt.ID] = newRoom
+			} else {
+				manager[chatID] = newRoom
 			}
 
-			manager[chatEnt.ID] = newRoom
+			go newRoom.Run()
 
 			user := &chat.User{
 				Username: username,
