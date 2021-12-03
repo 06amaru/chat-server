@@ -75,7 +75,14 @@ func (r *Route) JoinChat(manager map[int]*chat.Chat) echo.HandlerFunc {
 			}
 
 			go newRoom.Run()
-			chatEnt, _ := r.db.Chat.Create().AddMemberIDs(receiverID, userClient.ID).Save(context.Background())
+			chatEnt, err := r.db.Chat.Create().
+				SetName("noname").
+				SetType("public").
+				AddMemberIDs(receiverID, userClient.ID).Save(context.Background())
+			if err != nil {
+				log.Println("Error al crear chat en bd")
+				log.Println(err)
+			}
 
 			manager[chatEnt.ID] = newRoom
 

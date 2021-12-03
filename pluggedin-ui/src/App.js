@@ -14,8 +14,7 @@ import Home from './components/home/Home';
 const AuthenticatedRoute = ({children}) => {
   let { user } = useAuth()
   let location = useLocation() 
-  
-  if(!user) {
+  if(user === null) {
     return <Navigate to="/login" state={{ from: location }}/>;
   }
 

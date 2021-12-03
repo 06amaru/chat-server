@@ -27,6 +27,14 @@ var (
 	}
 )
 
+type DataStruct struct {
+	Ar []uint8 `json:"data"`
+}
+
+type PrivateKey struct {
+	Pk DataStruct `json:"privateKey"`
+}
+
 func main() {
 	// Echo instance
 	e := echo.New()
@@ -52,7 +60,7 @@ func main() {
 	var manager = make(map[int]*chat.Chat)
 
 	// encargado de almacenar las llaves privadas de los usuarios
-	var keeper = make(map[string]string)
+	var keeper = make(map[string][]uint8)
 
 	//TODO HASH PASSWORD
 	//curl -X POST -H 'Content-Type: application/json' -d '{"username":"jaoks", "password":"sdtc"}' localhost:1323/signup
@@ -71,16 +79,24 @@ func main() {
 			// wscat -c ws://localhost:1323/api/fluent/chat -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFtYXJ1IiwiZXhwIjoxNjM3Mzg5MTM2fQ.JysM4J-00sOP84Q_bzfW5wgw3QGPksSEikFe9JOVrAw"
 			//fluent.GET("/chat", r.JoinChat(manager))
 
-			fluent.GET("/verify", func(c echo.Context) error {
-				return c.String(http.StatusAccepted, "ok")
+			fluent.GET("/secret-key", func(c echo.Context) error {
+
+				authHeader := c.Get("user").(*jwt.Token)
+				username := authHeader.Claims.(jwt.MapClaims)["username"].(string)
+				return c.JSON(http.StatusAccepted, keeper[username])
 			})
 			fluent.POST("/secret-key", func(c echo.Context) error {
-				privateKey := c.QueryParam("pk")
+				k := new(PrivateKey)
+				if err := c.Bind(&k); err != nil {
+					log.Println("ERROR ")
+					log.Println(err)
+				}
+
 				//context has a map where user is the default key for auth-header
 				authHeader := c.Get("user").(*jwt.Token)
 				username := authHeader.Claims.(jwt.MapClaims)["username"].(string)
-				keeper[username] = privateKey
-				return c.String(http.StatusAccepted, "ok")
+				keeper[username] = k.Pk.Ar
+				return c.String(http.StatusOK, "ok")
 			})
 
 			//consigue todos los chats
