@@ -15,7 +15,7 @@ import {
 const Transition = (props) => {
 
     const handleChange = e => {
-        props.setReceiverId(e.target.value)
+        props.setReceiverUsername(e.target.value)
     }
 
     return(
@@ -33,13 +33,13 @@ const Transition = (props) => {
             <AlertDialogHeader>Por favor ingresar ID del receptor</AlertDialogHeader>
             <AlertDialogCloseButton />
             <AlertDialogBody>
-                <Input value={props.receiverId} placeholder="ID de receptor. eg: 666" onChange={handleChange}/>
+                <Input value={props.receiverUsername} placeholder="ID de receptor. eg: 666" onChange={handleChange}/>
             </AlertDialogBody>
             <AlertDialogFooter>
                 <Button ref={props.cancelRef} onClick={props.onClose}>
                 Cancelar
                 </Button>
-                <Button colorScheme='red' ml={3}>
+                <Button colorScheme='red' ml={3} onClick={props.createChat}>
                 Crear
                 </Button>
             </AlertDialogFooter>

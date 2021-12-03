@@ -28,7 +28,7 @@ export const AuthProvider = ({children}) => {
                 setLoadingInitial(false)
             } else {
                 let pk = await response.json()
-                console.log(Buffer(pk))
+                console.log(pk)
                 if(pk === null) {
                     console.log("BUG llave privada no existe !!")
                 }

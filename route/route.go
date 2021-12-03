@@ -37,12 +37,22 @@ func NewRoute(client *ent.Client) *Route {
 func (r *Route) JoinChat(manager map[int]*chat.Chat) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
-		chatID, _ := strconv.Atoi(c.Param("id"))
-		receiverID, _ := strconv.Atoi(c.Param("receiver"))
 		if err != nil {
 			log.Println("Error on websocket connection:", err.Error())
 		}
 		defer ws.Close()
+
+		chatID, _ := strconv.Atoi(c.QueryParam("id")) // se utiliza cuando ya existe el chat
+
+		receiverUsername := c.QueryParam("receiver") // se utiliza solo cuando se va crear un chat
+
+		receiverClient, err := r.db.User.
+			Query().
+			Where(user.UsernameEQ(receiverUsername)).
+			First(context.Background())
+		if err != nil {
+			log.Println(err)
+		}
 
 		//context has a map where user is the default key for auth-header
 		authHeader := c.Get("user").(*jwt.Token)
@@ -78,7 +88,7 @@ func (r *Route) JoinChat(manager map[int]*chat.Chat) echo.HandlerFunc {
 			chatEnt, err := r.db.Chat.Create().
 				SetName("noname").
 				SetType("public").
-				AddMemberIDs(receiverID, userClient.ID).Save(context.Background())
+				AddMemberIDs(receiverClient.ID, userClient.ID).Save(context.Background())
 			if err != nil {
 				log.Println("Error al crear chat en bd")
 				log.Println(err)

@@ -76,8 +76,22 @@ func main() {
 		fluent := api.Group("/fluent")
 		{
 			fluent.Use(middleware.JWT(route.MySigningKey))
-			// wscat -c ws://localhost:1323/api/fluent/chat -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFtYXJ1IiwiZXhwIjoxNjM3Mzg5MTM2fQ.JysM4J-00sOP84Q_bzfW5wgw3QGPksSEikFe9JOVrAw"
-			//fluent.GET("/chat", r.JoinChat(manager))
+
+			fluent.GET("/secret-key-receiver", func(c echo.Context) error {
+				username := c.QueryParam("username")
+				return c.JSON(http.StatusOK, keeper[username])
+			})
+
+			fluent.POST("/secret-key-receiver", func(c echo.Context) error {
+				k := new(PrivateKey)
+				if err := c.Bind(&k); err != nil {
+					log.Println("ERROR ")
+					log.Println(err)
+				}
+				username := c.QueryParam("username")
+				keeper[username] = k.Pk.Ar
+				return c.String(http.StatusOK, "ok")
+			})
 
 			fluent.GET("/secret-key", func(c echo.Context) error {
 
@@ -85,6 +99,7 @@ func main() {
 				username := authHeader.Claims.(jwt.MapClaims)["username"].(string)
 				return c.JSON(http.StatusAccepted, keeper[username])
 			})
+
 			fluent.POST("/secret-key", func(c echo.Context) error {
 				k := new(PrivateKey)
 				if err := c.Bind(&k); err != nil {
