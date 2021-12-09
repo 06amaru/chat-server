@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/amaru0601/fluent/chat"
 	"github.com/amaru0601/fluent/ent"
@@ -33,15 +34,30 @@ func NewRoute(client *ent.Client) *Route {
 	return &Route{db: client}
 }
 
-func (r *Route) JoinChat(manager map[string]*chat.Chat) echo.HandlerFunc {
+func (r *Route) JoinChat(manager map[int]*chat.Chat) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
-		chatID := c.Param("id")
-
 		if err != nil {
 			log.Println("Error on websocket connection:", err.Error())
 		}
 		defer ws.Close()
+
+		chatID, _ := strconv.Atoi(c.QueryParam("id")) // se utiliza cuando ya existe el chat
+
+		receiverUsername := c.QueryParam("receiver") // se utiliza solo cuando se va crear un chat
+
+		var receiverID = -1
+		if receiverUsername != "" {
+			receiverClient, err := r.db.User.
+				Query().
+				Where(user.UsernameEQ(receiverUsername)).
+				First(context.Background())
+			if err != nil {
+				log.Println(err)
+			} else {
+				receiverID = receiverClient.ID
+			}
+		}
 
 		//context has a map where user is the default key for auth-header
 		authHeader := c.Get("user").(*jwt.Token)
@@ -72,10 +88,26 @@ func (r *Route) JoinChat(manager map[string]*chat.Chat) echo.HandlerFunc {
 				Leave:    make(chan *chat.User),
 				Id:       chatID,
 			}
+			if receiverID != -1 {
+				//solo debo crear un chat cuando el receiverID sea diferente a -1
+				//en caso el id sea -1 significa que el front ya tiene registrado este chat y solo
+				//falta crear el canal no es necesario crear el chat
+				//TODO: verificar si el chat por crear ya existe
+				chatEnt, err := r.db.Chat.Create().
+					SetName("noname").
+					SetType("public").
+					AddMemberIDs(receiverID, userClient.ID).Save(context.Background())
+				if err != nil {
+					log.Println("Error al crear chat en bd")
+					log.Println(err)
+				}
+
+				manager[chatEnt.ID] = newRoom
+			} else {
+				manager[chatID] = newRoom
+			}
 
 			go newRoom.Run()
-
-			manager[chatID] = newRoom
 
 			user := &chat.User{
 				Username: username,

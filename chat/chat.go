@@ -9,7 +9,7 @@ type Chat struct {
 	Messages chan *Message
 	Join     chan *User
 	Leave    chan *User
-	Id       string
+	Id       int
 }
 
 func (c *Chat) Run() {

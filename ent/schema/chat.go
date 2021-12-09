@@ -14,7 +14,7 @@ type Chat struct {
 // Fields of the Chat.
 func (Chat) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name"),
+		field.String("name").Default("noname"),
 		field.Enum("type").Values("private", "public"),
 		field.Bool("deleted").Default(false),
 	}
@@ -24,6 +24,6 @@ func (Chat) Fields() []ent.Field {
 func (Chat) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("members", User.Type),
-		edge.To("has", Message.Type),
+		edge.To("messages", Message.Type),
 	}
 }

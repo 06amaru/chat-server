@@ -19,8 +19,8 @@ const (
 	FieldDeleted = "deleted"
 	// EdgeMembers holds the string denoting the members edge name in mutations.
 	EdgeMembers = "members"
-	// EdgeHas holds the string denoting the has edge name in mutations.
-	EdgeHas = "has"
+	// EdgeMessages holds the string denoting the messages edge name in mutations.
+	EdgeMessages = "messages"
 	// Table holds the table name of the chat in the database.
 	Table = "chats"
 	// MembersTable is the table that holds the members relation/edge. The primary key declared below.
@@ -28,11 +28,11 @@ const (
 	// MembersInverseTable is the table name for the User entity.
 	// It exists in this package in order to avoid circular dependency with the "user" package.
 	MembersInverseTable = "users"
-	// HasTable is the table that holds the has relation/edge. The primary key declared below.
-	HasTable = "chat_has"
-	// HasInverseTable is the table name for the Message entity.
+	// MessagesTable is the table that holds the messages relation/edge. The primary key declared below.
+	MessagesTable = "chat_messages"
+	// MessagesInverseTable is the table name for the Message entity.
 	// It exists in this package in order to avoid circular dependency with the "message" package.
-	HasInverseTable = "messages"
+	MessagesInverseTable = "messages"
 )
 
 // Columns holds all SQL columns for chat fields.
@@ -47,9 +47,9 @@ var (
 	// MembersPrimaryKey and MembersColumn2 are the table columns denoting the
 	// primary key for the members relation (M2M).
 	MembersPrimaryKey = []string{"chat_id", "user_id"}
-	// HasPrimaryKey and HasColumn2 are the table columns denoting the
-	// primary key for the has relation (M2M).
-	HasPrimaryKey = []string{"chat_id", "message_id"}
+	// MessagesPrimaryKey and MessagesColumn2 are the table columns denoting the
+	// primary key for the messages relation (M2M).
+	MessagesPrimaryKey = []string{"chat_id", "message_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).

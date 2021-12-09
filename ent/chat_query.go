@@ -28,8 +28,8 @@ type ChatQuery struct {
 	fields     []string
 	predicates []predicate.Chat
 	// eager-loading edges.
-	withMembers *UserQuery
-	withHas     *MessageQuery
+	withMembers  *UserQuery
+	withMessages *MessageQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -88,8 +88,8 @@ func (cq *ChatQuery) QueryMembers() *UserQuery {
 	return query
 }
 
-// QueryHas chains the current query on the "has" edge.
-func (cq *ChatQuery) QueryHas() *MessageQuery {
+// QueryMessages chains the current query on the "messages" edge.
+func (cq *ChatQuery) QueryMessages() *MessageQuery {
 	query := &MessageQuery{config: cq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
@@ -102,7 +102,7 @@ func (cq *ChatQuery) QueryHas() *MessageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(chat.Table, chat.FieldID, selector),
 			sqlgraph.To(message.Table, message.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, chat.HasTable, chat.HasPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, chat.MessagesTable, chat.MessagesPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -286,13 +286,13 @@ func (cq *ChatQuery) Clone() *ChatQuery {
 		return nil
 	}
 	return &ChatQuery{
-		config:      cq.config,
-		limit:       cq.limit,
-		offset:      cq.offset,
-		order:       append([]OrderFunc{}, cq.order...),
-		predicates:  append([]predicate.Chat{}, cq.predicates...),
-		withMembers: cq.withMembers.Clone(),
-		withHas:     cq.withHas.Clone(),
+		config:       cq.config,
+		limit:        cq.limit,
+		offset:       cq.offset,
+		order:        append([]OrderFunc{}, cq.order...),
+		predicates:   append([]predicate.Chat{}, cq.predicates...),
+		withMembers:  cq.withMembers.Clone(),
+		withMessages: cq.withMessages.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
@@ -310,14 +310,14 @@ func (cq *ChatQuery) WithMembers(opts ...func(*UserQuery)) *ChatQuery {
 	return cq
 }
 
-// WithHas tells the query-builder to eager-load the nodes that are connected to
-// the "has" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *ChatQuery) WithHas(opts ...func(*MessageQuery)) *ChatQuery {
+// WithMessages tells the query-builder to eager-load the nodes that are connected to
+// the "messages" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ChatQuery) WithMessages(opts ...func(*MessageQuery)) *ChatQuery {
 	query := &MessageQuery{config: cq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withHas = query
+	cq.withMessages = query
 	return cq
 }
 
@@ -388,7 +388,7 @@ func (cq *ChatQuery) sqlAll(ctx context.Context) ([]*Chat, error) {
 		_spec       = cq.querySpec()
 		loadedTypes = [2]bool{
 			cq.withMembers != nil,
-			cq.withHas != nil,
+			cq.withMessages != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
@@ -476,13 +476,13 @@ func (cq *ChatQuery) sqlAll(ctx context.Context) ([]*Chat, error) {
 		}
 	}
 
-	if query := cq.withHas; query != nil {
+	if query := cq.withMessages; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
 		ids := make(map[int]*Chat, len(nodes))
 		for _, node := range nodes {
 			ids[node.ID] = node
 			fks = append(fks, node.ID)
-			node.Edges.Has = []*Message{}
+			node.Edges.Messages = []*Message{}
 		}
 		var (
 			edgeids []int
@@ -491,11 +491,11 @@ func (cq *ChatQuery) sqlAll(ctx context.Context) ([]*Chat, error) {
 		_spec := &sqlgraph.EdgeQuerySpec{
 			Edge: &sqlgraph.EdgeSpec{
 				Inverse: false,
-				Table:   chat.HasTable,
-				Columns: chat.HasPrimaryKey,
+				Table:   chat.MessagesTable,
+				Columns: chat.MessagesPrimaryKey,
 			},
 			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(chat.HasPrimaryKey[0], fks...))
+				s.Where(sql.InValues(chat.MessagesPrimaryKey[0], fks...))
 			},
 			ScanValues: func() [2]interface{} {
 				return [2]interface{}{new(sql.NullInt64), new(sql.NullInt64)}
@@ -523,7 +523,7 @@ func (cq *ChatQuery) sqlAll(ctx context.Context) ([]*Chat, error) {
 			},
 		}
 		if err := sqlgraph.QueryEdges(ctx, cq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "has": %w`, err)
+			return nil, fmt.Errorf(`query edges "messages": %w`, err)
 		}
 		query.Where(message.IDIn(edgeids...))
 		neighbors, err := query.All(ctx)
@@ -533,10 +533,10 @@ func (cq *ChatQuery) sqlAll(ctx context.Context) ([]*Chat, error) {
 		for _, n := range neighbors {
 			nodes, ok := edges[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "has" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected "messages" node returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.Has = append(nodes[i].Edges.Has, n)
+				nodes[i].Edges.Messages = append(nodes[i].Edges.Messages, n)
 			}
 		}
 	}

@@ -29,7 +29,7 @@ const (
 	// FromColumn is the table column denoting the from relation/edge.
 	FromColumn = "user_messages"
 	// WhereTable is the table that holds the where relation/edge. The primary key declared below.
-	WhereTable = "chat_has"
+	WhereTable = "chat_messages"
 	// WhereInverseTable is the table name for the Chat entity.
 	// It exists in this package in order to avoid circular dependency with the "chat" package.
 	WhereInverseTable = "chats"

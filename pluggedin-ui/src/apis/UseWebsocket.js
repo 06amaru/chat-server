@@ -3,13 +3,19 @@ import eccrypto from "eccrypto"
 
 
 //other approach to share ws along the app is a context provider but for small app this is ok
-const UseWebsocket = (url) => {
+const UseWebsocket = (url, chatId, receiver) => {
     const [messages, setMessages] = useState([])
     const ws = useRef(null)
 
     useEffect(() => {
         const jwt = localStorage.getItem("jwt")
-        ws.current = new WebSocket(url + "?jwt="+jwt)
+        if (receiver === "") {
+            ws.current = new WebSocket(url + "?jwt="+jwt+"&id="+chatId)
+        } else {
+            //create new chat
+            console.log("create new chat")
+            ws.current = new WebSocket(url + "?jwt="+jwt+"&receiver="+receiver)
+        }
         ws.current.onmessage = async (e) => {
             const data = JSON.parse(e.data)
             console.log(data.sender)
@@ -35,6 +41,7 @@ const UseWebsocket = (url) => {
         }
 
         return () => {
+            console.log("cerrando web socket")
             ws.current.close()
             ws.current = null
         }

@@ -1,13 +1,16 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 
 	"github.com/amaru0601/fluent/chat"
 	"github.com/amaru0601/fluent/db"
+	"github.com/amaru0601/fluent/ent/user"
 	"github.com/amaru0601/fluent/route"
 	"github.com/amaru0601/fluent/security"
+	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -23,6 +26,14 @@ var (
 		},
 	}
 )
+
+type DataStruct struct {
+	Ar []uint8 `json:"data"`
+}
+
+type PrivateKey struct {
+	Pk DataStruct `json:"privateKey"`
+}
 
 func main() {
 	// Echo instance
@@ -46,7 +57,10 @@ func main() {
 	})
 
 	// encargado de almacenar las direcciones de memoria de los chats para luego poder conectarse
-	var manager = make(map[string]*chat.Chat)
+	var manager = make(map[int]*chat.Chat)
+
+	// encargado de almacenar las llaves privadas de los usuarios
+	var keeper = make(map[string][]uint8)
 
 	//TODO HASH PASSWORD
 	//curl -X POST -H 'Content-Type: application/json' -d '{"username":"jaoks", "password":"sdtc"}' localhost:1323/signup
@@ -62,14 +76,65 @@ func main() {
 		fluent := api.Group("/fluent")
 		{
 			fluent.Use(middleware.JWT(route.MySigningKey))
-			// wscat -c ws://localhost:1323/api/fluent/chat -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFtYXJ1IiwiZXhwIjoxNjM3Mzg5MTM2fQ.JysM4J-00sOP84Q_bzfW5wgw3QGPksSEikFe9JOVrAw"
-			//fluent.GET("/chat", r.JoinChat(manager))
 
-			fluent.GET("/verify", func(c echo.Context) error {
-				return c.String(http.StatusAccepted, "ok")
+			fluent.GET("/secret-key-receiver", func(c echo.Context) error {
+				username := c.QueryParam("username")
+				return c.JSON(http.StatusOK, keeper[username])
 			})
 
-			//TODO: Hacer endpoint para jalar todos los mensajes
+			fluent.POST("/secret-key-receiver", func(c echo.Context) error {
+				k := new(PrivateKey)
+				if err := c.Bind(&k); err != nil {
+					log.Println("ERROR ")
+					log.Println(err)
+				}
+				username := c.QueryParam("username")
+				keeper[username] = k.Pk.Ar
+				return c.String(http.StatusOK, "ok")
+			})
+
+			fluent.GET("/secret-key", func(c echo.Context) error {
+
+				authHeader := c.Get("user").(*jwt.Token)
+				username := authHeader.Claims.(jwt.MapClaims)["username"].(string)
+				return c.JSON(http.StatusAccepted, keeper[username])
+			})
+
+			fluent.POST("/secret-key", func(c echo.Context) error {
+				k := new(PrivateKey)
+				if err := c.Bind(&k); err != nil {
+					log.Println("ERROR ")
+					log.Println(err)
+				}
+
+				//context has a map where user is the default key for auth-header
+				authHeader := c.Get("user").(*jwt.Token)
+				username := authHeader.Claims.(jwt.MapClaims)["username"].(string)
+				keeper[username] = k.Pk.Ar
+				return c.String(http.StatusOK, "ok")
+			})
+
+			//consigue todos los chats
+			fluent.GET("/chats", func(c echo.Context) error {
+				//context has a map where user is the default key for auth-header
+				authHeader := c.Get("user").(*jwt.Token)
+				username := authHeader.Claims.(jwt.MapClaims)["username"].(string)
+				entClient, err := db.GetClient()
+
+				if err != nil {
+					return c.String(http.StatusInternalServerError, "no se pudo conectar a la base de datos")
+				}
+
+				user, _ := entClient.User.Query().Where(
+					user.UsernameEQ(username),
+				).First(context.Background())
+
+				chats, _ := user.QueryChats().All(context.Background())
+
+				return c.JSON(http.StatusOK, chats)
+			})
+
+			//TODO: Hacer endpoint para jalar todos los mensajes -- CHALLENGE: almacenar las KEYS de esos mensajes
 		}
 		plugged := api.Group("/plugged")
 		{

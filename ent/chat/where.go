@@ -306,25 +306,25 @@ func HasMembersWith(preds ...predicate.User) predicate.Chat {
 	})
 }
 
-// HasHas applies the HasEdge predicate on the "has" edge.
-func HasHas() predicate.Chat {
+// HasMessages applies the HasEdge predicate on the "messages" edge.
+func HasMessages() predicate.Chat {
 	return predicate.Chat(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(HasTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, HasTable, HasPrimaryKey...),
+			sqlgraph.To(MessagesTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, MessagesTable, MessagesPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasHasWith applies the HasEdge predicate on the "has" edge with a given conditions (other predicates).
-func HasHasWith(preds ...predicate.Message) predicate.Chat {
+// HasMessagesWith applies the HasEdge predicate on the "messages" edge with a given conditions (other predicates).
+func HasMessagesWith(preds ...predicate.Message) predicate.Chat {
 	return predicate.Chat(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(HasInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, HasTable, HasPrimaryKey...),
+			sqlgraph.To(MessagesInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, MessagesTable, MessagesPrimaryKey...),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

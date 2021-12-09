@@ -1,10 +1,10 @@
 import './App.css';
 import {ChakraProvider} from '@chakra-ui/react'
-import Chat from './chat/Chat';
 import { Route, Navigate, Routes, useLocation, BrowserRouter } from 'react-router-dom';
 import { AuthProvider, useAuth } from './auth/UseAuth';
 //import { lazy, Suspense } from 'react';
-import Login from './login/Login';
+import Login from './components/login/Login';
+import Home from './components/home/Home';
 
 // const AsyncRoute = ({element, ...props}) => {
 //   console.log("async")
@@ -14,8 +14,7 @@ import Login from './login/Login';
 const AuthenticatedRoute = ({children}) => {
   let { user } = useAuth()
   let location = useLocation() 
-  
-  if(!user) {
+  if(user === null) {
     return <Navigate to="/login" state={{ from: location }}/>;
   }
 
@@ -33,7 +32,7 @@ function App() {
               path="/"
               element={
                 <AuthenticatedRoute>
-                  <Chat />
+                  <Home />
                 </AuthenticatedRoute>
               } />
               <Route 

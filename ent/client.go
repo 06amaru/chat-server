@@ -237,15 +237,15 @@ func (c *ChatClient) QueryMembers(ch *Chat) *UserQuery {
 	return query
 }
 
-// QueryHas queries the has edge of a Chat.
-func (c *ChatClient) QueryHas(ch *Chat) *MessageQuery {
+// QueryMessages queries the messages edge of a Chat.
+func (c *ChatClient) QueryMessages(ch *Chat) *MessageQuery {
 	query := &MessageQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := ch.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(chat.Table, chat.FieldID, id),
 			sqlgraph.To(message.Table, message.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, chat.HasTable, chat.HasPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, chat.MessagesTable, chat.MessagesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
 		return fromV, nil
