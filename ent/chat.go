@@ -4,10 +4,10 @@ package ent
 
 import (
 	"fmt"
-	"github.com/amaru0601/fluent/ent/chat"
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/amaru0601/fluent/ent/chat"
 )
 
 // Chat is the model entity for the Chat schema.

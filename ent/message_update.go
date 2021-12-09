@@ -5,15 +5,15 @@ package ent
 import (
 	"context"
 	"fmt"
-	"github.com/amaru0601/fluent/ent/chat"
-	"github.com/amaru0601/fluent/ent/message"
-	"github.com/amaru0601/fluent/ent/predicate"
-	"github.com/amaru0601/fluent/ent/user"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/amaru0601/fluent/ent/chat"
+	"github.com/amaru0601/fluent/ent/message"
+	"github.com/amaru0601/fluent/ent/predicate"
+	"github.com/amaru0601/fluent/ent/user"
 )
 
 // MessageUpdate is the builder for updating Message entities.

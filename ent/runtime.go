@@ -3,11 +3,12 @@
 package ent
 
 import (
+	"time"
+
 	"github.com/amaru0601/fluent/ent/chat"
 	"github.com/amaru0601/fluent/ent/message"
 	"github.com/amaru0601/fluent/ent/schema"
 	"github.com/amaru0601/fluent/ent/user"
-	"time"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -44,4 +45,12 @@ func init() {
 	userDescPassword := userFields[2].Descriptor()
 	// user.DefaultPassword holds the default value on creation for the password field.
 	user.DefaultPassword = userDescPassword.Default.(string)
+	// userDescPrivateKey is the schema descriptor for private_key field.
+	userDescPrivateKey := userFields[3].Descriptor()
+	// user.DefaultPrivateKey holds the default value on creation for the private_key field.
+	user.DefaultPrivateKey = userDescPrivateKey.Default.(string)
+	// userDescPublicKey is the schema descriptor for public_key field.
+	userDescPublicKey := userFields[4].Descriptor()
+	// user.DefaultPublicKey holds the default value on creation for the public_key field.
+	user.DefaultPublicKey = userDescPublicKey.Default.(string)
 }

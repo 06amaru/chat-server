@@ -4,11 +4,11 @@ package ent
 
 import (
 	"fmt"
-	"github.com/amaru0601/fluent/ent/user"
 	"strings"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/amaru0601/fluent/ent/user"
 )
 
 // User is the model entity for the User schema.
@@ -22,6 +22,10 @@ type User struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Password holds the value of the "password" field.
 	Password string `json:"password,omitempty"`
+	// PrivateKey holds the value of the "private_key" field.
+	PrivateKey string `json:"private_key,omitempty"`
+	// PublicKey holds the value of the "public_key" field.
+	PublicKey string `json:"public_key,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges UserEdges `json:"edges"`
@@ -63,7 +67,7 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case user.FieldID:
 			values[i] = new(sql.NullInt64)
-		case user.FieldUsername, user.FieldPassword:
+		case user.FieldUsername, user.FieldPassword, user.FieldPrivateKey, user.FieldPublicKey:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -105,6 +109,18 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field password", values[i])
 			} else if value.Valid {
 				u.Password = value.String
+			}
+		case user.FieldPrivateKey:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field private_key", values[i])
+			} else if value.Valid {
+				u.PrivateKey = value.String
+			}
+		case user.FieldPublicKey:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field public_key", values[i])
+			} else if value.Valid {
+				u.PublicKey = value.String
 			}
 		}
 	}
@@ -150,6 +166,10 @@ func (u *User) String() string {
 	builder.WriteString(u.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", password=")
 	builder.WriteString(u.Password)
+	builder.WriteString(", private_key=")
+	builder.WriteString(u.PrivateKey)
+	builder.WriteString(", public_key=")
+	builder.WriteString(u.PublicKey)
 	builder.WriteByte(')')
 	return builder.String()
 }

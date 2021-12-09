@@ -3,10 +3,9 @@
 package chat
 
 import (
-	"github.com/amaru0601/fluent/ent/predicate"
-
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/amaru0601/fluent/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.

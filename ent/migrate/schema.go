@@ -48,6 +48,8 @@ var (
 		{Name: "username", Type: field.TypeString, Default: "unknown"},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "password", Type: field.TypeString, Default: "isnotasecret"},
+		{Name: "private_key", Type: field.TypeString, Default: "unknown"},
+		{Name: "public_key", Type: field.TypeString, Default: "unknown"},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{

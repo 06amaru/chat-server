@@ -17,6 +17,10 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldPassword holds the string denoting the password field in the database.
 	FieldPassword = "password"
+	// FieldPrivateKey holds the string denoting the private_key field in the database.
+	FieldPrivateKey = "private_key"
+	// FieldPublicKey holds the string denoting the public_key field in the database.
+	FieldPublicKey = "public_key"
 	// EdgeMessages holds the string denoting the messages edge name in mutations.
 	EdgeMessages = "messages"
 	// EdgeChats holds the string denoting the chats edge name in mutations.
@@ -43,6 +47,8 @@ var Columns = []string{
 	FieldUsername,
 	FieldCreatedAt,
 	FieldPassword,
+	FieldPrivateKey,
+	FieldPublicKey,
 }
 
 var (
@@ -68,4 +74,8 @@ var (
 	DefaultCreatedAt func() time.Time
 	// DefaultPassword holds the default value on creation for the "password" field.
 	DefaultPassword string
+	// DefaultPrivateKey holds the default value on creation for the "private_key" field.
+	DefaultPrivateKey string
+	// DefaultPublicKey holds the default value on creation for the "public_key" field.
+	DefaultPublicKey string
 )

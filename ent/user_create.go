@@ -6,13 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/amaru0601/fluent/ent/chat"
-	"github.com/amaru0601/fluent/ent/message"
-	"github.com/amaru0601/fluent/ent/user"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/amaru0601/fluent/ent/chat"
+	"github.com/amaru0601/fluent/ent/message"
+	"github.com/amaru0601/fluent/ent/user"
 )
 
 // UserCreate is the builder for creating a User entity.
@@ -60,6 +60,34 @@ func (uc *UserCreate) SetPassword(s string) *UserCreate {
 func (uc *UserCreate) SetNillablePassword(s *string) *UserCreate {
 	if s != nil {
 		uc.SetPassword(*s)
+	}
+	return uc
+}
+
+// SetPrivateKey sets the "private_key" field.
+func (uc *UserCreate) SetPrivateKey(s string) *UserCreate {
+	uc.mutation.SetPrivateKey(s)
+	return uc
+}
+
+// SetNillablePrivateKey sets the "private_key" field if the given value is not nil.
+func (uc *UserCreate) SetNillablePrivateKey(s *string) *UserCreate {
+	if s != nil {
+		uc.SetPrivateKey(*s)
+	}
+	return uc
+}
+
+// SetPublicKey sets the "public_key" field.
+func (uc *UserCreate) SetPublicKey(s string) *UserCreate {
+	uc.mutation.SetPublicKey(s)
+	return uc
+}
+
+// SetNillablePublicKey sets the "public_key" field if the given value is not nil.
+func (uc *UserCreate) SetNillablePublicKey(s *string) *UserCreate {
+	if s != nil {
+		uc.SetPublicKey(*s)
 	}
 	return uc
 }
@@ -177,6 +205,14 @@ func (uc *UserCreate) defaults() {
 		v := user.DefaultPassword
 		uc.mutation.SetPassword(v)
 	}
+	if _, ok := uc.mutation.PrivateKey(); !ok {
+		v := user.DefaultPrivateKey
+		uc.mutation.SetPrivateKey(v)
+	}
+	if _, ok := uc.mutation.PublicKey(); !ok {
+		v := user.DefaultPublicKey
+		uc.mutation.SetPublicKey(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -189,6 +225,12 @@ func (uc *UserCreate) check() error {
 	}
 	if _, ok := uc.mutation.Password(); !ok {
 		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "password"`)}
+	}
+	if _, ok := uc.mutation.PrivateKey(); !ok {
+		return &ValidationError{Name: "private_key", err: errors.New(`ent: missing required field "private_key"`)}
+	}
+	if _, ok := uc.mutation.PublicKey(); !ok {
+		return &ValidationError{Name: "public_key", err: errors.New(`ent: missing required field "public_key"`)}
 	}
 	return nil
 }
@@ -240,6 +282,22 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldPassword,
 		})
 		_node.Password = value
+	}
+	if value, ok := uc.mutation.PrivateKey(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldPrivateKey,
+		})
+		_node.PrivateKey = value
+	}
+	if value, ok := uc.mutation.PublicKey(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldPublicKey,
+		})
+		_node.PublicKey = value
 	}
 	if nodes := uc.mutation.MessagesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

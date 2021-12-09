@@ -5,12 +5,13 @@ package ent
 import (
 	"context"
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/amaru0601/fluent/ent/chat"
 	"github.com/amaru0601/fluent/ent/message"
 	"github.com/amaru0601/fluent/ent/predicate"
 	"github.com/amaru0601/fluent/ent/user"
-	"sync"
-	"time"
 
 	"entgo.io/ent"
 )
@@ -1112,6 +1113,8 @@ type UserMutation struct {
 	username        *string
 	created_at      *time.Time
 	password        *string
+	private_key     *string
+	public_key      *string
 	clearedFields   map[string]struct{}
 	messages        map[int]struct{}
 	removedmessages map[int]struct{}
@@ -1311,6 +1314,78 @@ func (m *UserMutation) ResetPassword() {
 	m.password = nil
 }
 
+// SetPrivateKey sets the "private_key" field.
+func (m *UserMutation) SetPrivateKey(s string) {
+	m.private_key = &s
+}
+
+// PrivateKey returns the value of the "private_key" field in the mutation.
+func (m *UserMutation) PrivateKey() (r string, exists bool) {
+	v := m.private_key
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPrivateKey returns the old "private_key" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldPrivateKey(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldPrivateKey is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldPrivateKey requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPrivateKey: %w", err)
+	}
+	return oldValue.PrivateKey, nil
+}
+
+// ResetPrivateKey resets all changes to the "private_key" field.
+func (m *UserMutation) ResetPrivateKey() {
+	m.private_key = nil
+}
+
+// SetPublicKey sets the "public_key" field.
+func (m *UserMutation) SetPublicKey(s string) {
+	m.public_key = &s
+}
+
+// PublicKey returns the value of the "public_key" field in the mutation.
+func (m *UserMutation) PublicKey() (r string, exists bool) {
+	v := m.public_key
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPublicKey returns the old "public_key" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldPublicKey(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldPublicKey is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldPublicKey requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPublicKey: %w", err)
+	}
+	return oldValue.PublicKey, nil
+}
+
+// ResetPublicKey resets all changes to the "public_key" field.
+func (m *UserMutation) ResetPublicKey() {
+	m.public_key = nil
+}
+
 // AddMessageIDs adds the "messages" edge to the Message entity by ids.
 func (m *UserMutation) AddMessageIDs(ids ...int) {
 	if m.messages == nil {
@@ -1438,7 +1513,7 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 5)
 	if m.username != nil {
 		fields = append(fields, user.FieldUsername)
 	}
@@ -1447,6 +1522,12 @@ func (m *UserMutation) Fields() []string {
 	}
 	if m.password != nil {
 		fields = append(fields, user.FieldPassword)
+	}
+	if m.private_key != nil {
+		fields = append(fields, user.FieldPrivateKey)
+	}
+	if m.public_key != nil {
+		fields = append(fields, user.FieldPublicKey)
 	}
 	return fields
 }
@@ -1462,6 +1543,10 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case user.FieldPassword:
 		return m.Password()
+	case user.FieldPrivateKey:
+		return m.PrivateKey()
+	case user.FieldPublicKey:
+		return m.PublicKey()
 	}
 	return nil, false
 }
@@ -1477,6 +1562,10 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCreatedAt(ctx)
 	case user.FieldPassword:
 		return m.OldPassword(ctx)
+	case user.FieldPrivateKey:
+		return m.OldPrivateKey(ctx)
+	case user.FieldPublicKey:
+		return m.OldPublicKey(ctx)
 	}
 	return nil, fmt.Errorf("unknown User field %s", name)
 }
@@ -1506,6 +1595,20 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPassword(v)
+		return nil
+	case user.FieldPrivateKey:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPrivateKey(v)
+		return nil
+	case user.FieldPublicKey:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPublicKey(v)
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)
@@ -1564,6 +1667,12 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldPassword:
 		m.ResetPassword()
+		return nil
+	case user.FieldPrivateKey:
+		m.ResetPrivateKey()
+		return nil
+	case user.FieldPublicKey:
+		m.ResetPublicKey()
 		return nil
 	}
 	return fmt.Errorf("unknown User field %s", name)

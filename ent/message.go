@@ -4,12 +4,12 @@ package ent
 
 import (
 	"fmt"
-	"github.com/amaru0601/fluent/ent/message"
-	"github.com/amaru0601/fluent/ent/user"
 	"strings"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/amaru0601/fluent/ent/message"
+	"github.com/amaru0601/fluent/ent/user"
 )
 
 // Message is the model entity for the Message schema.

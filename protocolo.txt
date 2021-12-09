@@ -1,0 +1,25 @@
+Notation: AES(m,k) = Encrypt message m with key k, {m}pk+(X) = encrypt message m with X's public key.
+
+Key creation and uploading
+1. Alice generates pk+(A), pk-(A)
+2. Alice generates password (AP). Encrypts mk(A) = AES(pk-(A),AP)
+3. Alice uploads (mk(A), pk+(A)) to server.
+4. Concurrently, Bob does the same. 
+At this point, Server has pk+(B), pk+(A), mk(A), mk(B).
+
+Now, Alice wants to message (m) Bob 
+1. Alice asks for pk+(B) from server.
+2. Alice generates random k (can be per session or per message).
+3. Alice generates C = AES(m,k)
+4. Alice generates C' = {AES(m,k) || k}pk+(B)
+5. Alice uploads C' to server, tells server to send to Bob.
+
+Now, server needs to send message to Bob
+Case 1:
+Bob is online, server sends message inmediately.
+Case 2:
+Bob is offline, server needs to queue message and send to Bob once he comes online.
+
+Now, Bob has the message.
+1. Deciphers C' with pk-(B), obtains AES(m,k) || k.
+2. Deciphers AES(m,k) with k, obtains m.
