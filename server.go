@@ -97,7 +97,10 @@ func main() {
 
 				authHeader := c.Get("user").(*jwt.Token)
 				username := authHeader.Claims.(jwt.MapClaims)["username"].(string)
-				return c.JSON(http.StatusAccepted, keeper[username])
+				user, _ := entClient.User.Query().Where(
+					user.UsernameEQ(username),
+				).First(context.Background())
+				return c.JSON(http.StatusAccepted, user.PrivateKey)
 			})
 
 			fluent.POST("/secret-key", func(c echo.Context) error {

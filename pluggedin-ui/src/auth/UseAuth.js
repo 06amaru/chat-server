@@ -65,25 +65,8 @@ export const AuthProvider = ({children}) => {
                 }
             })
             const pkJson = await pk.json()
-            let privateKey = ""
-            console.log(pkJson)
-            if(pkJson === null) {
-                console.log("no tienes una private key asociada asi que debes generar una")
-                privateKey = eccrypto.generatePrivate()
-                console.log(privateKey)
-                await fetch(`http://127.0.0.1:1323/api/fluent/secret-key`, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer '+responseJson
-                    },
-                    body: JSON.stringify({privateKey})
-                })
-            }
-            
             setLoading(false)
-            setUser(privateKey)
+            setUser(pkJson)
             return true
         }
     }
