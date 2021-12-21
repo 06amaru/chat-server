@@ -157,9 +157,16 @@ func (r *Route) SignIn() echo.HandlerFunc {
 	}
 }
 
+type UserSignUp struct {
+	Username   string `json:"username"`
+	Password   string `json:"password"`
+	PrivateKey string `json:"privatekey"`
+	PublicKey  string `json:"publickey"`
+}
+
 func (r *Route) SignUp() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		u := new(UserSignIn)
+		u := new(UserSignUp)
 		if err := c.Bind(u); err != nil {
 			return err
 		}
@@ -168,6 +175,8 @@ func (r *Route) SignUp() echo.HandlerFunc {
 			Create().
 			SetUsername(u.Username).
 			SetPassword(u.Password).
+			SetPrivateKey(u.PrivateKey).
+			SetPublicKey(u.PublicKey).
 			Save(context.Background())
 		if err != nil {
 			fmt.Println(err)

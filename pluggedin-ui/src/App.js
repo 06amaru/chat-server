@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './auth/UseAuth';
 //import { lazy, Suspense } from 'react';
 import Login from './components/login/Login';
 import Home from './components/home/Home';
+import Signup from './signup/Signup';
 
 // const AsyncRoute = ({element, ...props}) => {
 //   console.log("async")
@@ -40,6 +41,13 @@ function App() {
                 path="/login"
                 element={
                   <Login />
+                }
+              />
+              <Route
+                exact
+                path="/register"
+                element={
+                  <Signup />
                 }
               />
           </Routes>
