@@ -30,17 +30,17 @@ const Transition = (props) => {
             <AlertDialogOverlay />
 
             <AlertDialogContent>
-            <AlertDialogHeader>Por favor ingresar ID del receptor</AlertDialogHeader>
+            <AlertDialogHeader>Por favor ingresar el username de la persona que recibe el mensaje</AlertDialogHeader>
             <AlertDialogCloseButton />
             <AlertDialogBody>
-                <Input value={props.receiverUsername} placeholder="ID de receptor. eg: 666" onChange={handleChange}/>
+                <Input value={props.receiverUsername} placeholder="username" onChange={handleChange}/>
             </AlertDialogBody>
             <AlertDialogFooter>
                 <Button ref={props.cancelRef} onClick={props.onClose}>
                 Cancelar
                 </Button>
                 <Button colorScheme='red' ml={3} onClick={props.createChat}>
-                Crear
+                Crear Chat
                 </Button>
             </AlertDialogFooter>
             </AlertDialogContent>

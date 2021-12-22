@@ -77,20 +77,12 @@ func main() {
 		{
 			fluent.Use(middleware.JWT(route.MySigningKey))
 
-			fluent.GET("/secret-key-receiver", func(c echo.Context) error {
+			fluent.GET("/public-key", func(c echo.Context) error {
 				username := c.QueryParam("username")
-				return c.JSON(http.StatusOK, keeper[username])
-			})
-
-			fluent.POST("/secret-key-receiver", func(c echo.Context) error {
-				k := new(PrivateKey)
-				if err := c.Bind(&k); err != nil {
-					log.Println("ERROR ")
-					log.Println(err)
-				}
-				username := c.QueryParam("username")
-				keeper[username] = k.Pk.Ar
-				return c.String(http.StatusOK, "ok")
+				user, _ := entClient.User.Query().Where(
+					user.UsernameEQ(username),
+				).First(context.Background())
+				return c.JSON(http.StatusOK, user.PublicKey)
 			})
 
 			fluent.GET("/secret-key", func(c echo.Context) error {

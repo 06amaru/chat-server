@@ -17,6 +17,8 @@ const Signup = () => {
         const mk = CryptoJS.AES.encrypt( JSON.stringify({
             pk: privateKey
         }), password).toString()
+        console.log(publicKey)
+        console.log(mk)
 
         const response = await fetch('http://127.0.0.1:1323/signup', {
             method: 'POST',

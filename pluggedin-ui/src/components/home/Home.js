@@ -46,27 +46,13 @@ const Home = () => {
 
     const initChat = async () => {
         const jwt = localStorage.getItem("jwt")
-        const pk = await fetch(`http://127.0.0.1:1323/api/fluent/secret-key-receiver?username=${receiverUsername}`, {
+        const pk = await fetch(`http://127.0.0.1:1323/api/fluent/public-key?username=${receiverUsername}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Bearer '+jwt
                 }
             })
         const pkJson = await pk.json()
-        
-        if (pkJson === null) {
-            let privateKey = eccrypto.generatePrivate()
-            const response = await fetch(`http://127.0.0.1:1323/api/fluent/secret-key-receiver?username=${receiverUsername}`, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer '+jwt
-                    },
-                    body: JSON.stringify({privateKey})
-                })
-            return response.ok ? true: false
-        } else return true
     }
 
     const createChat = async () => {
