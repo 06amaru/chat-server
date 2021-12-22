@@ -24,12 +24,7 @@ mkdir ${HOME}/postgres-data/
 2. Desplegar un contenedor con docker para Postgres
 
 ```
-docker run -d 
-	--name jaoksdb 
-	-e POSTGRES_PASSWORD=123456 
-	-v ${HOME}/postgres-data/:/var/lib/postgresql/data 
-        -p 5434:5432
-        postgres
+docker run --name jaoksdb -e POSTGRES_PASSWORD=123456 -p 5434:5432 -d postgres
 ```
 
 En caso tener un contenedor ya configurado ejecutar lo siguiente
