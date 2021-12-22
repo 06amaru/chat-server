@@ -20,7 +20,7 @@ func (User) Fields() []ent.Field {
 		field.Time("created_at").Default(time.Now),
 		field.String("password").Default("isnotasecret"),
 		field.String("private_key").Default("unknown"),
-		field.String("public_key").Default("unknown"),
+		field.Bytes("public_key"),
 	}
 }
 

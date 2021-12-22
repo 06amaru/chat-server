@@ -30,7 +30,7 @@ const Transition = (props) => {
             <AlertDialogOverlay />
 
             <AlertDialogContent>
-            <AlertDialogHeader>Por favor ingresar el username de la persona que recibe el mensaje</AlertDialogHeader>
+            <AlertDialogHeader>Ingresa el nombre de usuario con quien deseas conversar</AlertDialogHeader>
             <AlertDialogCloseButton />
             <AlertDialogBody>
                 <Input value={props.receiverUsername} placeholder="username" onChange={handleChange}/>

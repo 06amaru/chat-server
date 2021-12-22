@@ -76,6 +76,4 @@ var (
 	DefaultPassword string
 	// DefaultPrivateKey holds the default value on creation for the "private_key" field.
 	DefaultPrivateKey string
-	// DefaultPublicKey holds the default value on creation for the "public_key" field.
-	DefaultPublicKey string
 )

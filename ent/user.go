@@ -25,7 +25,7 @@ type User struct {
 	// PrivateKey holds the value of the "private_key" field.
 	PrivateKey string `json:"private_key,omitempty"`
 	// PublicKey holds the value of the "public_key" field.
-	PublicKey string `json:"public_key,omitempty"`
+	PublicKey []byte `json:"public_key,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges UserEdges `json:"edges"`
@@ -65,9 +65,11 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case user.FieldPublicKey:
+			values[i] = new([]byte)
 		case user.FieldID:
 			values[i] = new(sql.NullInt64)
-		case user.FieldUsername, user.FieldPassword, user.FieldPrivateKey, user.FieldPublicKey:
+		case user.FieldUsername, user.FieldPassword, user.FieldPrivateKey:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -117,10 +119,10 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 				u.PrivateKey = value.String
 			}
 		case user.FieldPublicKey:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field public_key", values[i])
-			} else if value.Valid {
-				u.PublicKey = value.String
+			} else if value != nil {
+				u.PublicKey = *value
 			}
 		}
 	}
@@ -169,7 +171,7 @@ func (u *User) String() string {
 	builder.WriteString(", private_key=")
 	builder.WriteString(u.PrivateKey)
 	builder.WriteString(", public_key=")
-	builder.WriteString(u.PublicKey)
+	builder.WriteString(fmt.Sprintf("%v", u.PublicKey))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -34,6 +34,14 @@ func (cu *ChatUpdate) SetName(s string) *ChatUpdate {
 	return cu
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cu *ChatUpdate) SetNillableName(s *string) *ChatUpdate {
+	if s != nil {
+		cu.SetName(*s)
+	}
+	return cu
+}
+
 // SetType sets the "type" field.
 func (cu *ChatUpdate) SetType(c chat.Type) *ChatUpdate {
 	cu.mutation.SetType(c)
@@ -370,6 +378,14 @@ type ChatUpdateOne struct {
 // SetName sets the "name" field.
 func (cuo *ChatUpdateOne) SetName(s string) *ChatUpdateOne {
 	cuo.mutation.SetName(s)
+	return cuo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cuo *ChatUpdateOne) SetNillableName(s *string) *ChatUpdateOne {
+	if s != nil {
+		cuo.SetName(*s)
+	}
 	return cuo
 }
 

@@ -63,6 +63,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultName holds the default value on creation for the "name" field.
+	DefaultName string
 	// DefaultDeleted holds the default value on creation for the "deleted" field.
 	DefaultDeleted bool
 )

@@ -13,12 +13,14 @@ const Signup = () => {
     const signup = async () => {
         const privateKey = eccrypto.generatePrivate()
         const publicKey = eccrypto.getPublic(privateKey)
-
+        //console.log(privateKey)
         const mk = CryptoJS.AES.encrypt( JSON.stringify({
-            pk: privateKey
-        }), password).toString()
-        console.log(publicKey)
-        console.log(mk)
+            privateKey
+        }), password)
+        //console.log(publicKey)
+        //console.log(mk)
+        //const decrypted = CryptoJS.AES.decrypt(mk.toString(), password)
+        //console.log(decrypted.toString(CryptoJS.enc.Utf8))
 
         const response = await fetch('http://127.0.0.1:1323/signup', {
             method: 'POST',
@@ -29,8 +31,8 @@ const Signup = () => {
             body: JSON.stringify({
                 username,
                 password,
-                'publickey': publicKey.toString('utf-8'),
-                'privatekey': mk
+                'publickey': publicKey.toJSON().data,
+                'privatekey': mk.toString()
             })
         })
 

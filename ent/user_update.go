@@ -86,16 +86,8 @@ func (uu *UserUpdate) SetNillablePrivateKey(s *string) *UserUpdate {
 }
 
 // SetPublicKey sets the "public_key" field.
-func (uu *UserUpdate) SetPublicKey(s string) *UserUpdate {
-	uu.mutation.SetPublicKey(s)
-	return uu
-}
-
-// SetNillablePublicKey sets the "public_key" field if the given value is not nil.
-func (uu *UserUpdate) SetNillablePublicKey(s *string) *UserUpdate {
-	if s != nil {
-		uu.SetPublicKey(*s)
-	}
+func (uu *UserUpdate) SetPublicKey(b []byte) *UserUpdate {
+	uu.mutation.SetPublicKey(b)
 	return uu
 }
 
@@ -278,7 +270,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.PublicKey(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeBytes,
 			Value:  value,
 			Column: user.FieldPublicKey,
 		})
@@ -467,16 +459,8 @@ func (uuo *UserUpdateOne) SetNillablePrivateKey(s *string) *UserUpdateOne {
 }
 
 // SetPublicKey sets the "public_key" field.
-func (uuo *UserUpdateOne) SetPublicKey(s string) *UserUpdateOne {
-	uuo.mutation.SetPublicKey(s)
-	return uuo
-}
-
-// SetNillablePublicKey sets the "public_key" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillablePublicKey(s *string) *UserUpdateOne {
-	if s != nil {
-		uuo.SetPublicKey(*s)
-	}
+func (uuo *UserUpdateOne) SetPublicKey(b []byte) *UserUpdateOne {
+	uuo.mutation.SetPublicKey(b)
 	return uuo
 }
 
@@ -683,7 +667,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.PublicKey(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeBytes,
 			Value:  value,
 			Column: user.FieldPublicKey,
 		})

@@ -122,7 +122,7 @@ func PrivateKey(v string) predicate.User {
 }
 
 // PublicKey applies equality check predicate on the "public_key" field. It's identical to PublicKeyEQ.
-func PublicKey(v string) predicate.User {
+func PublicKey(v []byte) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldPublicKey), v))
 	})
@@ -538,21 +538,21 @@ func PrivateKeyContainsFold(v string) predicate.User {
 }
 
 // PublicKeyEQ applies the EQ predicate on the "public_key" field.
-func PublicKeyEQ(v string) predicate.User {
+func PublicKeyEQ(v []byte) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldPublicKey), v))
 	})
 }
 
 // PublicKeyNEQ applies the NEQ predicate on the "public_key" field.
-func PublicKeyNEQ(v string) predicate.User {
+func PublicKeyNEQ(v []byte) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldPublicKey), v))
 	})
 }
 
 // PublicKeyIn applies the In predicate on the "public_key" field.
-func PublicKeyIn(vs ...string) predicate.User {
+func PublicKeyIn(vs ...[]byte) predicate.User {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -569,7 +569,7 @@ func PublicKeyIn(vs ...string) predicate.User {
 }
 
 // PublicKeyNotIn applies the NotIn predicate on the "public_key" field.
-func PublicKeyNotIn(vs ...string) predicate.User {
+func PublicKeyNotIn(vs ...[]byte) predicate.User {
 	v := make([]interface{}, len(vs))
 	for i := range v {
 		v[i] = vs[i]
@@ -586,65 +586,30 @@ func PublicKeyNotIn(vs ...string) predicate.User {
 }
 
 // PublicKeyGT applies the GT predicate on the "public_key" field.
-func PublicKeyGT(v string) predicate.User {
+func PublicKeyGT(v []byte) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.GT(s.C(FieldPublicKey), v))
 	})
 }
 
 // PublicKeyGTE applies the GTE predicate on the "public_key" field.
-func PublicKeyGTE(v string) predicate.User {
+func PublicKeyGTE(v []byte) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.GTE(s.C(FieldPublicKey), v))
 	})
 }
 
 // PublicKeyLT applies the LT predicate on the "public_key" field.
-func PublicKeyLT(v string) predicate.User {
+func PublicKeyLT(v []byte) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.LT(s.C(FieldPublicKey), v))
 	})
 }
 
 // PublicKeyLTE applies the LTE predicate on the "public_key" field.
-func PublicKeyLTE(v string) predicate.User {
+func PublicKeyLTE(v []byte) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldPublicKey), v))
-	})
-}
-
-// PublicKeyContains applies the Contains predicate on the "public_key" field.
-func PublicKeyContains(v string) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldPublicKey), v))
-	})
-}
-
-// PublicKeyHasPrefix applies the HasPrefix predicate on the "public_key" field.
-func PublicKeyHasPrefix(v string) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldPublicKey), v))
-	})
-}
-
-// PublicKeyHasSuffix applies the HasSuffix predicate on the "public_key" field.
-func PublicKeyHasSuffix(v string) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldPublicKey), v))
-	})
-}
-
-// PublicKeyEqualFold applies the EqualFold predicate on the "public_key" field.
-func PublicKeyEqualFold(v string) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldPublicKey), v))
-	})
-}
-
-// PublicKeyContainsFold applies the ContainsFold predicate on the "public_key" field.
-func PublicKeyContainsFold(v string) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldPublicKey), v))
 	})
 }
 

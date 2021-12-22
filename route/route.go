@@ -161,7 +161,7 @@ type UserSignUp struct {
 	Username   string `json:"username"`
 	Password   string `json:"password"`
 	PrivateKey string `json:"privatekey"`
-	PublicKey  string `json:"publickey"`
+	PublicKey  []byte `json:"publickey"`
 }
 
 func (r *Route) SignUp() echo.HandlerFunc {

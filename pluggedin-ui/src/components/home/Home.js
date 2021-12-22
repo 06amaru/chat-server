@@ -1,11 +1,13 @@
 import React, {useEffect, useRef, useState} from 'react'
 import { Grid, GridItem } from '@chakra-ui/react'
 import { Box, VStack, Button } from '@chakra-ui/react'
+import { Flex, Spacer } from '@chakra-ui/layout'
 import { useDisclosure } from '@chakra-ui/hooks'
 import Chat from '../chat/Chat'
 import Transition from './Transition'
 import eccrypto from "eccrypto"
-
+import { useAuth } from '../../auth/UseAuth'
+import { useNavigate } from 'react-router';
 
 const Home = () => {
     const [chats, setChats] = useState([])
@@ -13,6 +15,8 @@ const Home = () => {
     const cancelRef = useRef()
     const [chat, setChat] = useState(null)
     const [receiverUsername, setReceiverUsername] = useState("")
+    let context = useAuth()
+    const navigate = useNavigate()
 
     useEffect(() => {
         async function getChats() {
@@ -65,7 +69,18 @@ const Home = () => {
         }
     }
 
+    const onLogout = () => {
+        context.logout()
+        navigate("/login", {replace: true})
+    }
+
     return (
+        <>
+        <Flex>
+            <Box>Bienvenido</Box>
+            <Spacer />
+            <Button onClick={onLogout}>Cerrar Sesión</Button>
+        </Flex>
         <Grid
         h="100%"
         templateRows='repeat(1, 1fr)'
@@ -100,6 +115,7 @@ const Home = () => {
                 </Box>
             </GridItem>
         </Grid>
+        </>
     )
 }
 

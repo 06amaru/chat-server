@@ -27,6 +27,14 @@ func (cc *ChatCreate) SetName(s string) *ChatCreate {
 	return cc
 }
 
+// SetNillableName sets the "name" field if the given value is not nil.
+func (cc *ChatCreate) SetNillableName(s *string) *ChatCreate {
+	if s != nil {
+		cc.SetName(*s)
+	}
+	return cc
+}
+
 // SetType sets the "type" field.
 func (cc *ChatCreate) SetType(c chat.Type) *ChatCreate {
 	cc.mutation.SetType(c)
@@ -148,6 +156,10 @@ func (cc *ChatCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (cc *ChatCreate) defaults() {
+	if _, ok := cc.mutation.Name(); !ok {
+		v := chat.DefaultName
+		cc.mutation.SetName(v)
+	}
 	if _, ok := cc.mutation.Deleted(); !ok {
 		v := chat.DefaultDeleted
 		cc.mutation.SetDeleted(v)

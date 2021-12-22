@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from "react";
 import eccrypto from "eccrypto"
+var CryptoJS = require("crypto-js");
 
 let AuthContext = createContext();
 
@@ -39,6 +40,11 @@ export const AuthProvider = ({children}) => {
         validateToken()
     }, [])
 
+    const logout = () => {
+        localStorage.clear()
+        setUser(null)
+    }
+
     const login = async (username, password) => {
         setLoading(true)
         //make fetch to login user
@@ -58,15 +64,17 @@ export const AuthProvider = ({children}) => {
         } else {
             let responseJson = await response.json()
             localStorage.setItem("jwt", responseJson)
-            const pk = await fetch('http://127.0.0.1:1323/api/fluent/secret-key', {
+            const key = await fetch('http://127.0.0.1:1323/api/fluent/secret-key', {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Bearer '+responseJson
                 }
             })
-            const pkJson = await pk.json()
+            const data = await key.json()
+            const decrypted = CryptoJS.AES.decrypt(data, password).toString(CryptoJS.enc.Utf8)
+            //console.log(decrypted)
             setLoading(false)
-            setUser(pkJson)
+            setUser(decrypted)
             return true
         }
     }
@@ -81,6 +89,7 @@ export const AuthProvider = ({children}) => {
         () => ({
             loading,
             error,
+            logout,
             login,
             signup,
             user

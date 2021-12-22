@@ -17,6 +17,10 @@ import (
 func init() {
 	chatFields := schema.Chat{}.Fields()
 	_ = chatFields
+	// chatDescName is the schema descriptor for name field.
+	chatDescName := chatFields[0].Descriptor()
+	// chat.DefaultName holds the default value on creation for the name field.
+	chat.DefaultName = chatDescName.Default.(string)
 	// chatDescDeleted is the schema descriptor for deleted field.
 	chatDescDeleted := chatFields[2].Descriptor()
 	// chat.DefaultDeleted holds the default value on creation for the deleted field.
@@ -49,8 +53,4 @@ func init() {
 	userDescPrivateKey := userFields[3].Descriptor()
 	// user.DefaultPrivateKey holds the default value on creation for the private_key field.
 	user.DefaultPrivateKey = userDescPrivateKey.Default.(string)
-	// userDescPublicKey is the schema descriptor for public_key field.
-	userDescPublicKey := userFields[4].Descriptor()
-	// user.DefaultPublicKey holds the default value on creation for the public_key field.
-	user.DefaultPublicKey = userDescPublicKey.Default.(string)
 }

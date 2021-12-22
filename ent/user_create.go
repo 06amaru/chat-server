@@ -79,16 +79,8 @@ func (uc *UserCreate) SetNillablePrivateKey(s *string) *UserCreate {
 }
 
 // SetPublicKey sets the "public_key" field.
-func (uc *UserCreate) SetPublicKey(s string) *UserCreate {
-	uc.mutation.SetPublicKey(s)
-	return uc
-}
-
-// SetNillablePublicKey sets the "public_key" field if the given value is not nil.
-func (uc *UserCreate) SetNillablePublicKey(s *string) *UserCreate {
-	if s != nil {
-		uc.SetPublicKey(*s)
-	}
+func (uc *UserCreate) SetPublicKey(b []byte) *UserCreate {
+	uc.mutation.SetPublicKey(b)
 	return uc
 }
 
@@ -209,10 +201,6 @@ func (uc *UserCreate) defaults() {
 		v := user.DefaultPrivateKey
 		uc.mutation.SetPrivateKey(v)
 	}
-	if _, ok := uc.mutation.PublicKey(); !ok {
-		v := user.DefaultPublicKey
-		uc.mutation.SetPublicKey(v)
-	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -293,7 +281,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := uc.mutation.PublicKey(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
+			Type:   field.TypeBytes,
 			Value:  value,
 			Column: user.FieldPublicKey,
 		})
