@@ -40,8 +40,7 @@ const Home = () => {
     }, [])
 
     const handleClick = async (i) => {
-        console.log(i)
-        const success = await fetchChat()
+        const success = await fetchChat(chats[i])
         if (success) {
             setChat(chats[i])
         } else {
@@ -50,8 +49,10 @@ const Home = () => {
         
     }
 
-    const fetchChat = async () => {
-        //get username
+    const fetchChat = async (chat) => {
+        //get usernames from chat
+        //then get public key
+        console.log(chat)
         try {
             return false
         } catch (error) {

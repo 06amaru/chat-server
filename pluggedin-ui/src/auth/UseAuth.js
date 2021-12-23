@@ -8,6 +8,7 @@ let AuthContext = createContext();
 export const AuthProvider = ({children}) => {
 
     const [user, setUser] = useState(null)
+    const [username, setUsername] = useState(null)
     const [error, setError] = useState()
     const [loading, setLoading] = useState()
     const [loadingInitial, setLoadingInitial] = useState(true)
@@ -16,26 +17,20 @@ export const AuthProvider = ({children}) => {
         
         async function validateToken() {
             const jwt = localStorage.getItem("jwt")
-            
-            const response = await fetch('http://127.0.0.1:1323/api/fluent/secret-key', {
+            const pk = localStorage.getItem("privatekey")
+            const response = await fetch('http://127.0.0.1:1323/api/fluent/username', {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Bearer '+jwt
                 }
             })
 
-            if(response.status !== 202) {
-                setUser(null)
-                setLoadingInitial(false)
-            } else {
-                let pk = await response.json()
-                console.log(pk)
-                if(pk === null) {
-                    console.log("BUG llave privada no existe !!")
-                }
+            if(response.status === 202 && pk !== null) {
                 setUser(pk)
-                setLoadingInitial(false)
+                const data = await response.json()
+                setUsername(data)
             }
+            setLoadingInitial(false)
         }
         validateToken()
     }, [])
@@ -73,6 +68,7 @@ export const AuthProvider = ({children}) => {
             const data = await key.json()
             const decrypted = CryptoJS.AES.decrypt(data, password).toString(CryptoJS.enc.Utf8)
             //console.log(decrypted)
+            localStorage.setItem("privatekey", decrypted)
             setLoading(false)
             setUser(decrypted)
             return true
@@ -92,8 +88,9 @@ export const AuthProvider = ({children}) => {
             logout,
             login,
             signup,
-            user
-        }), [loading, error, user]
+            user,
+            username
+        }), [loading, error, user, username]
     )
     
     return (

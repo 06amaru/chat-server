@@ -77,6 +77,12 @@ func main() {
 		{
 			fluent.Use(middleware.JWT(route.MySigningKey))
 
+			fluent.GET("/username", func(c echo.Context) error {
+				authHeader := c.Get("user").(*jwt.Token)
+				username := authHeader.Claims.(jwt.MapClaims)["username"].(string)
+				return c.JSON(http.StatusAccepted, username)
+			})
+
 			fluent.GET("/public-key", func(c echo.Context) error {
 				username := c.QueryParam("username")
 				user, _ := entClient.User.Query().Where(
