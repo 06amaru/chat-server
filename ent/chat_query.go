@@ -327,12 +327,12 @@ func (cq *ChatQuery) WithMessages(opts ...func(*MessageQuery)) *ChatQuery {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Type chat.Type `json:"type,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Chat.Query().
-//		GroupBy(chat.FieldName).
+//		GroupBy(chat.FieldType).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -354,11 +354,11 @@ func (cq *ChatQuery) GroupBy(field string, fields ...string) *ChatGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Type chat.Type `json:"type,omitempty"`
 //	}
 //
 //	client.Chat.Query().
-//		Select(chat.FieldName).
+//		Select(chat.FieldType).
 //		Scan(ctx, &v)
 //
 func (cq *ChatQuery) Select(fields ...string) *ChatSelect {

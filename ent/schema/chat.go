@@ -14,7 +14,6 @@ type Chat struct {
 // Fields of the Chat.
 func (Chat) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name").Default("noname"),
 		field.Enum("type").Values("private", "public"),
 		field.Bool("deleted").Default(false),
 	}

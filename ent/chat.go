@@ -15,8 +15,6 @@ type Chat struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Name holds the value of the "name" field.
-	Name string `json:"name,omitempty"`
 	// Type holds the value of the "type" field.
 	Type chat.Type `json:"type,omitempty"`
 	// Deleted holds the value of the "deleted" field.
@@ -64,7 +62,7 @@ func (*Chat) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullBool)
 		case chat.FieldID:
 			values[i] = new(sql.NullInt64)
-		case chat.FieldName, chat.FieldType:
+		case chat.FieldType:
 			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Chat", columns[i])
@@ -87,12 +85,6 @@ func (c *Chat) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			c.ID = int(value.Int64)
-		case chat.FieldName:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field name", values[i])
-			} else if value.Valid {
-				c.Name = value.String
-			}
 		case chat.FieldType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
@@ -143,8 +135,6 @@ func (c *Chat) String() string {
 	var builder strings.Builder
 	builder.WriteString("Chat(")
 	builder.WriteString(fmt.Sprintf("id=%v", c.ID))
-	builder.WriteString(", name=")
-	builder.WriteString(c.Name)
 	builder.WriteString(", type=")
 	builder.WriteString(fmt.Sprintf("%v", c.Type))
 	builder.WriteString(", deleted=")

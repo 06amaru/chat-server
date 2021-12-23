@@ -15,7 +15,7 @@ import {
 const Transition = (props) => {
 
     const handleChange = e => {
-        props.setReceiverUsername(e.target.value)
+        props.setusername(e.target.value)
     }
 
     return(
@@ -33,7 +33,7 @@ const Transition = (props) => {
             <AlertDialogHeader>Ingresa el nombre de usuario con quien deseas conversar</AlertDialogHeader>
             <AlertDialogCloseButton />
             <AlertDialogBody>
-                <Input value={props.receiverUsername} placeholder="username" onChange={handleChange}/>
+                <Input value={props.username} placeholder="username" onChange={handleChange}/>
             </AlertDialogBody>
             <AlertDialogFooter>
                 <Button ref={props.cancelRef} onClick={props.onClose}>

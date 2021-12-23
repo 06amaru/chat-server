@@ -11,8 +11,6 @@ const (
 	Label = "chat"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldName holds the string denoting the name field in the database.
-	FieldName = "name"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
 	// FieldDeleted holds the string denoting the deleted field in the database.
@@ -38,7 +36,6 @@ const (
 // Columns holds all SQL columns for chat fields.
 var Columns = []string{
 	FieldID,
-	FieldName,
 	FieldType,
 	FieldDeleted,
 }
@@ -63,8 +60,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultName holds the default value on creation for the "name" field.
-	DefaultName string
 	// DefaultDeleted holds the default value on creation for the "deleted" field.
 	DefaultDeleted bool
 )

@@ -94,7 +94,6 @@ func (r *Route) JoinChat(manager map[int]*chat.Chat) echo.HandlerFunc {
 				//falta crear el canal no es necesario crear el chat
 				//TODO: verificar si el chat por crear ya existe
 				chatEnt, err := r.db.Chat.Create().
-					SetName("noname").
 					SetType("public").
 					AddMemberIDs(receiverID, userClient.ID).Save(context.Background())
 				if err != nil {

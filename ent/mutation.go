@@ -36,7 +36,6 @@ type ChatMutation struct {
 	op              Op
 	typ             string
 	id              *int
-	name            *string
 	_type           *chat.Type
 	deleted         *bool
 	clearedFields   map[string]struct{}
@@ -128,42 +127,6 @@ func (m *ChatMutation) ID() (id int, exists bool) {
 		return
 	}
 	return *m.id, true
-}
-
-// SetName sets the "name" field.
-func (m *ChatMutation) SetName(s string) {
-	m.name = &s
-}
-
-// Name returns the value of the "name" field in the mutation.
-func (m *ChatMutation) Name() (r string, exists bool) {
-	v := m.name
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldName returns the old "name" field's value of the Chat entity.
-// If the Chat object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ChatMutation) OldName(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, fmt.Errorf("OldName is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, fmt.Errorf("OldName requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldName: %w", err)
-	}
-	return oldValue.Name, nil
-}
-
-// ResetName resets all changes to the "name" field.
-func (m *ChatMutation) ResetName() {
-	m.name = nil
 }
 
 // SetType sets the "type" field.
@@ -365,10 +328,7 @@ func (m *ChatMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ChatMutation) Fields() []string {
-	fields := make([]string, 0, 3)
-	if m.name != nil {
-		fields = append(fields, chat.FieldName)
-	}
+	fields := make([]string, 0, 2)
 	if m._type != nil {
 		fields = append(fields, chat.FieldType)
 	}
@@ -383,8 +343,6 @@ func (m *ChatMutation) Fields() []string {
 // schema.
 func (m *ChatMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case chat.FieldName:
-		return m.Name()
 	case chat.FieldType:
 		return m.GetType()
 	case chat.FieldDeleted:
@@ -398,8 +356,6 @@ func (m *ChatMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *ChatMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case chat.FieldName:
-		return m.OldName(ctx)
 	case chat.FieldType:
 		return m.OldType(ctx)
 	case chat.FieldDeleted:
@@ -413,13 +369,6 @@ func (m *ChatMutation) OldField(ctx context.Context, name string) (ent.Value, er
 // type.
 func (m *ChatMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case chat.FieldName:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetName(v)
-		return nil
 	case chat.FieldType:
 		v, ok := value.(chat.Type)
 		if !ok {
@@ -483,9 +432,6 @@ func (m *ChatMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ChatMutation) ResetField(name string) error {
 	switch name {
-	case chat.FieldName:
-		m.ResetName()
-		return nil
 	case chat.FieldType:
 		m.ResetType()
 		return nil

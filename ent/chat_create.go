@@ -21,20 +21,6 @@ type ChatCreate struct {
 	hooks    []Hook
 }
 
-// SetName sets the "name" field.
-func (cc *ChatCreate) SetName(s string) *ChatCreate {
-	cc.mutation.SetName(s)
-	return cc
-}
-
-// SetNillableName sets the "name" field if the given value is not nil.
-func (cc *ChatCreate) SetNillableName(s *string) *ChatCreate {
-	if s != nil {
-		cc.SetName(*s)
-	}
-	return cc
-}
-
 // SetType sets the "type" field.
 func (cc *ChatCreate) SetType(c chat.Type) *ChatCreate {
 	cc.mutation.SetType(c)
@@ -156,10 +142,6 @@ func (cc *ChatCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (cc *ChatCreate) defaults() {
-	if _, ok := cc.mutation.Name(); !ok {
-		v := chat.DefaultName
-		cc.mutation.SetName(v)
-	}
 	if _, ok := cc.mutation.Deleted(); !ok {
 		v := chat.DefaultDeleted
 		cc.mutation.SetDeleted(v)
@@ -168,9 +150,6 @@ func (cc *ChatCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cc *ChatCreate) check() error {
-	if _, ok := cc.mutation.Name(); !ok {
-		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "name"`)}
-	}
 	if _, ok := cc.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "type"`)}
 	}
@@ -209,14 +188,6 @@ func (cc *ChatCreate) createSpec() (*Chat, *sqlgraph.CreateSpec) {
 			},
 		}
 	)
-	if value, ok := cc.mutation.Name(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: chat.FieldName,
-		})
-		_node.Name = value
-	}
 	if value, ok := cc.mutation.GetType(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeEnum,

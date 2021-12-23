@@ -11,7 +11,6 @@ var (
 	// ChatsColumns holds the columns for the "chats" table.
 	ChatsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString, Default: "noname"},
 		{Name: "type", Type: field.TypeEnum, Enums: []string{"private", "public"}},
 		{Name: "deleted", Type: field.TypeBool, Default: false},
 	}

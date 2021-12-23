@@ -17,12 +17,8 @@ import (
 func init() {
 	chatFields := schema.Chat{}.Fields()
 	_ = chatFields
-	// chatDescName is the schema descriptor for name field.
-	chatDescName := chatFields[0].Descriptor()
-	// chat.DefaultName holds the default value on creation for the name field.
-	chat.DefaultName = chatDescName.Default.(string)
 	// chatDescDeleted is the schema descriptor for deleted field.
-	chatDescDeleted := chatFields[2].Descriptor()
+	chatDescDeleted := chatFields[1].Descriptor()
 	// chat.DefaultDeleted holds the default value on creation for the deleted field.
 	chat.DefaultDeleted = chatDescDeleted.Default.(bool)
 	messageFields := schema.Message{}.Fields()

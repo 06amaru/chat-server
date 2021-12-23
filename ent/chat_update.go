@@ -28,20 +28,6 @@ func (cu *ChatUpdate) Where(ps ...predicate.Chat) *ChatUpdate {
 	return cu
 }
 
-// SetName sets the "name" field.
-func (cu *ChatUpdate) SetName(s string) *ChatUpdate {
-	cu.mutation.SetName(s)
-	return cu
-}
-
-// SetNillableName sets the "name" field if the given value is not nil.
-func (cu *ChatUpdate) SetNillableName(s *string) *ChatUpdate {
-	if s != nil {
-		cu.SetName(*s)
-	}
-	return cu
-}
-
 // SetType sets the "type" field.
 func (cu *ChatUpdate) SetType(c chat.Type) *ChatUpdate {
 	cu.mutation.SetType(c)
@@ -227,13 +213,6 @@ func (cu *ChatUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := cu.mutation.Name(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: chat.FieldName,
-		})
-	}
 	if value, ok := cu.mutation.GetType(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeEnum,
@@ -373,20 +352,6 @@ type ChatUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ChatMutation
-}
-
-// SetName sets the "name" field.
-func (cuo *ChatUpdateOne) SetName(s string) *ChatUpdateOne {
-	cuo.mutation.SetName(s)
-	return cuo
-}
-
-// SetNillableName sets the "name" field if the given value is not nil.
-func (cuo *ChatUpdateOne) SetNillableName(s *string) *ChatUpdateOne {
-	if s != nil {
-		cuo.SetName(*s)
-	}
-	return cuo
 }
 
 // SetType sets the "type" field.
@@ -597,13 +562,6 @@ func (cuo *ChatUpdateOne) sqlSave(ctx context.Context) (_node *Chat, err error) 
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := cuo.mutation.Name(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: chat.FieldName,
-		})
 	}
 	if value, ok := cuo.mutation.GetType(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{

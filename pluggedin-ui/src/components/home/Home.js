@@ -8,13 +8,15 @@ import Transition from './Transition'
 import eccrypto from "eccrypto"
 import { useAuth } from '../../auth/UseAuth'
 import { useNavigate } from 'react-router';
+import { base64 } from "rfc4648";
 
 const Home = () => {
     const [chats, setChats] = useState([])
     const { isOpen, onOpen, onClose } = useDisclosure()
     const cancelRef = useRef()
     const [chat, setChat] = useState(null)
-    const [receiverUsername, setReceiverUsername] = useState("")
+    const [username, setusername] = useState("")
+    const [publicKey, setPublicKey] = useState(null)
     let context = useAuth()
     const navigate = useNavigate()
 
@@ -39,7 +41,7 @@ const Home = () => {
 
     const handleClick = async (i) => {
         console.log(i)
-        const success = await initChat()
+        const success = await fetchChat()
         if (success) {
             setChat(chats[i])
         } else {
@@ -48,15 +50,32 @@ const Home = () => {
         
     }
 
+    const fetchChat = async () => {
+        //get username
+        try {
+            return false
+        } catch (error) {
+            
+        }
+    }
+
     const initChat = async () => {
-        const jwt = localStorage.getItem("jwt")
-        const pk = await fetch(`http://127.0.0.1:1323/api/fluent/public-key?username=${receiverUsername}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Bearer '+jwt
-                }
-            })
-        const pkJson = await pk.json()
+        try {
+            const jwt = localStorage.getItem("jwt")
+            const pk = await fetch(`http://127.0.0.1:1323/api/fluent/public-key?username=${username}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer '+jwt
+                    }
+                })
+            const pkJson = await pk.json()
+            setPublicKey(base64.parse(pkJson))
+            return true    
+        } catch (error) {
+            console.log(error)
+            return false
+        }
+        
     }
 
     const createChat = async () => {
@@ -94,8 +113,8 @@ const Home = () => {
                         createChat={createChat}
                         onClose={onClose}
                         cancelRef={cancelRef} 
-                        receiverUsername={receiverUsername} 
-                        setReceiverUsername={setReceiverUsername} />
+                        username={username} 
+                        setusername={setusername} />
                     {
                         chats.length > 0 ? chats.map((c, i) => 
                             <Box key={i} bg="green" width="100%" textAlign="center" onClick={() => handleClick(i)}>
@@ -108,7 +127,7 @@ const Home = () => {
             <GridItem colSpan={4} bg='tomato' >
                 <Box>
                     {
-                        chat? <Chat chat={chat} receiver={receiverUsername} />
+                        chat? <Chat chat={chat} receiver={username} publicKey={publicKey}/>
                         :<Box>No has seleccionado un chat</Box>
                     }
                     
