@@ -5,7 +5,6 @@ import { Flex, Spacer } from '@chakra-ui/layout'
 import { useDisclosure } from '@chakra-ui/hooks'
 import Chat from '../chat/Chat'
 import Transition from './Transition'
-import eccrypto from "eccrypto"
 import { useAuth } from '../../auth/UseAuth'
 import { useNavigate } from 'react-router';
 import { base64 } from "rfc4648";
@@ -52,7 +51,16 @@ const Home = () => {
     const fetchChat = async (chat) => {
         //get usernames from chat
         //then get public key
-        console.log(chat)
+        const jwt = localStorage.getItem("jwt")
+        console.log(chat.id)
+        const response = await fetch(`http://127.0.0.1:1323/api/fluent/members?chatID=${chat.id}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer '+jwt
+            }
+        })
+        const members = await response.json()
+        console.log(members)
         try {
             return false
         } catch (error) {

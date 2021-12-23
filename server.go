@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/amaru0601/fluent/chat"
 	"github.com/amaru0601/fluent/db"
@@ -76,6 +77,24 @@ func main() {
 		fluent := api.Group("/fluent")
 		{
 			fluent.Use(middleware.JWT(route.MySigningKey))
+
+			fluent.GET("/members", func(c echo.Context) error {
+				chatID, _ := strconv.Atoi(c.QueryParam("chatID"))
+				chat, _ := entClient.Chat.Get(context.Background(), chatID)
+				members, _ := chat.QueryMembers().Select(user.FieldUsername, user.FieldPublicKey).All(context.Background())
+				type Member struct {
+					Username  string `json:"username"`
+					PublicKey []byte `json:"publickey"`
+				}
+				membersArr := make([]Member, 0)
+				for _, v := range members {
+					var m Member
+					m.Username = v.Username
+					m.PublicKey = v.PublicKey
+					membersArr = append(membersArr, m)
+				}
+				return c.JSON(http.StatusOK, membersArr)
+			})
 
 			fluent.GET("/username", func(c echo.Context) error {
 				authHeader := c.Get("user").(*jwt.Token)
