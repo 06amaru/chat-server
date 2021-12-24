@@ -62,9 +62,9 @@ const Home = () => {
                 }
             })
             const members = await response.json()
-            console.log(members)
+            //console.log(members)
             const result = members.filter(user => user.username !== context.username)
-            console.log(result)
+            //console.log(result)
             setusername(result[0].username)
             setPublicKey(base64.parse(result[0].publickey))
             return true            

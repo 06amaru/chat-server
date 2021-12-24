@@ -2,7 +2,7 @@ import { Button } from "@chakra-ui/button"
 import { Box } from "@chakra-ui/layout"
 
 const Messages = (props) => {
-    console.log(props)
+    //console.log(props)
     return (
         <Box>
         {
