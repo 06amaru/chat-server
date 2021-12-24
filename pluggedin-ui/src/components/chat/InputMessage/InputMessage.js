@@ -1,6 +1,7 @@
 import {React, useState} from "react"
 import { Input, Box } from "@chakra-ui/react"
 import eccrypto from "eccrypto"
+var CryptoJS = require("crypto-js");
 
 const InputMessage = (props) => {
 
@@ -8,15 +9,14 @@ const InputMessage = (props) => {
 
     const onKeyUp = async(event) => {
         if (event.charCode === 13 && message !== "") {
-            const privateKey = eccrypto.generatePrivate()
-            const publicKey = eccrypto.getPublic(privateKey)
-            //TODO Conseguir la llave publica de Alice (RECEPTOR)
-            const encrypted = await eccrypto.encrypt(publicKey, Buffer.from(message))
-
+            const key = 'random-key'
+            let msgEncrypted = CryptoJS.AES.encrypt(message, key).toString()
+            const encrypted = await eccrypto.encrypt(
+                Buffer.from(props.publicKey), 
+                Buffer.from(msgEncrypted+":::::"+key))
             props.ws.current.send(
                 JSON.stringify({
-                    "message": encrypted,
-                    "pk": privateKey
+                    "message": encrypted
                 })
             )
             //const decrypted = await eccrypto.decrypt(privateKey, encrypted)

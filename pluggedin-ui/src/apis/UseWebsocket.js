@@ -26,17 +26,17 @@ const UseWebsocket = (url, chatId, receiver) => {
             } else {
                 const body = JSON.parse(data.body)
                 //console.log(body.pk)
-                //console.log(body.message)
-                const publicKey = {
-                    ciphertext : Buffer(body.message.ciphertext),
-                    ephemPublicKey : Buffer(body.message.ephemPublicKey),
-                    iv: Buffer(body.message.iv),
-                    mac: Buffer(body.message.mac)
-                }
+                console.log(body.message)
+                //const publicKey = {
+                //    ciphertext : Buffer(body.message.ciphertext),
+                //    ephemPublicKey : Buffer(body.message.ephemPublicKey),
+                //    iv: Buffer(body.message.iv),
+                //    mac: Buffer(body.message.mac)
+                //}
                 //console.log(publicKey)
-                const decrypted = await eccrypto.decrypt(Buffer(body.pk), publicKey)
+                //const decrypted = await eccrypto.decrypt(Buffer(body.pk), publicKey)
                 //console.log(decrypted)
-                setMessages((prev) => [...prev, decrypted.toString()])
+                //setMessages((prev) => [...prev, decrypted.toString()])
             }
             //setMessages((prev) => [...prev, data])
         }
