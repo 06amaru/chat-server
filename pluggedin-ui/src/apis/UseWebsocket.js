@@ -9,13 +9,14 @@ const UseWebsocket = (url, chatId, receiver) => {
 
     useEffect(() => {
         const jwt = localStorage.getItem("jwt")
-        if (receiver === "") {
+        if (chatId !== null) {
             ws.current = new WebSocket(url + "?jwt="+jwt+"&id="+chatId)
         } else {
             //create new chat
             console.log("create new chat")
             ws.current = new WebSocket(url + "?jwt="+jwt+"&receiver="+receiver)
         }
+        setMessages([])
         ws.current.onmessage = async (e) => {
             const data = JSON.parse(e.data)
             console.log(data.sender)
@@ -45,7 +46,7 @@ const UseWebsocket = (url, chatId, receiver) => {
             ws.current.close()
             ws.current = null
         }
-    }, [url])
+    }, [url, chatId])
 
     return {
         ws,

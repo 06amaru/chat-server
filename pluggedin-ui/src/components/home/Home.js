@@ -20,23 +20,23 @@ const Home = () => {
     const navigate = useNavigate()
 
     useEffect(() => {
-        async function getChats() {
-            const jwt = localStorage.getItem("jwt")
-            const response = await fetch('http://127.0.0.1:1323/api/fluent/chats', {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Bearer '+jwt
-                }
-            })
-            if (response.status === 200) {
-                let data = await response.json()
-                console.log(...data)
-                setChats(data)
-            }
-        }
-
         getChats()
     }, [])
+
+    async function getChats() {
+        const jwt = localStorage.getItem("jwt")
+        const response = await fetch('http://127.0.0.1:1323/api/fluent/chats', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer '+jwt
+            }
+        })
+        if (response.status === 200) {
+            let data = await response.json()
+            // console.log(...data)
+            setChats(data)
+        }
+    }
 
     const handleClick = async (i) => {
         const success = await fetchChat(chats[i])
@@ -49,22 +49,28 @@ const Home = () => {
     }
 
     const fetchChat = async (chat) => {
-        //get usernames from chat
-        //then get public key
-        const jwt = localStorage.getItem("jwt")
-        console.log(chat.id)
-        const response = await fetch(`http://127.0.0.1:1323/api/fluent/members?chatID=${chat.id}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': 'Bearer '+jwt
-            }
-        })
-        const members = await response.json()
-        console.log(members)
+
         try {
-            return false
+            //get usernames from chat
+            //then get public key
+            const jwt = localStorage.getItem("jwt")
+            //console.log(chat.id)
+            const response = await fetch(`http://127.0.0.1:1323/api/fluent/members?chatID=${chat.id}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer '+jwt
+                }
+            })
+            const members = await response.json()
+            console.log(members)
+            const result = members.filter(user => user.username !== context.username)
+            console.log(result)
+            setusername(result[0].username)
+            setPublicKey(base64.parse(result[0].publickey))
+            return true            
         } catch (error) {
-            
+            console.log(error)
+            return false
         }
     }
 
@@ -92,6 +98,7 @@ const Home = () => {
         if (success) {
             setChat("nuevo chat")
             onClose()
+            getChats()
         } else {
             console.log("Hubo problemas")
         }
