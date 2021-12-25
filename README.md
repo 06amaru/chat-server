@@ -1,18 +1,14 @@
 # Pluggedin
 
-Chat en tiempo real 
+Chat en tiempo real con encriptación E2E para conversaciones efímeras mediante un protocolo híbrido (AES y ECIES)
 
 ### Meta actual
 
-Tener un room para chatear, encriptacion ECIES, usar websockets con SSL
+Tener un cola para mensajería asíncrona (caso usuario offline). Actualmente dos usuarios hablan sin problemas online, pero si un se encuentra offline y recibe mensajes durante ese tiempo necesita conseguir los mensajes desde la cola.
 
 ### Pasos futuros
 
-Agregar contactos
-Tener diferentes rooms (crear id de chats, cada chat es un websocket)
-Room para solo dos personas
-Usar Casbin para autorizacion
-
+Implementar un socket para cada usuario donde se mande notificaciones acerca de nuevos mensajes
 ### Configuración
 
 1. Crear una carpeta que posteriormente sera usada para la persistencia de la base de datos
