@@ -16,7 +16,7 @@ type User struct {
 	Room     *Chat
 }
 
-func (u *User) Read(client *ent.Client, userClient *ent.User) {
+func (u *User) Read(client *ent.Client, userClient *ent.User, chatID int) {
 	defer func() {
 		//necesitamos avisar al Chat que user se fue
 		u.Room.Leave <- u
@@ -28,10 +28,19 @@ func (u *User) Read(client *ent.Client, userClient *ent.User) {
 		} else {
 			fmt.Println("reading ...")
 			fmt.Println(message)
-			_, err := client.Message.
+			msg, err := client.Message.
 				Create().
 				SetBody(string(message)).
 				SetFrom(userClient).
+				Save(context.Background())
+			if err != nil {
+				log.Print(err)
+				break
+			}
+
+			_, err = client.Chat.
+				UpdateOneID(chatID).
+				AddMessageIDs(msg.ID).
 				Save(context.Background())
 			if err != nil {
 				log.Print(err)

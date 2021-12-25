@@ -79,7 +79,7 @@ func (r *Route) JoinChat(manager map[int]*chat.Chat) echo.HandlerFunc {
 				Room:     room,
 			}
 			room.Join <- user
-			user.Read(r.db, userClient)
+			user.Read(r.db, userClient, chatID)
 		} else {
 			newRoom := &chat.Chat{
 				Users:    make(map[string]*chat.User),
@@ -88,10 +88,12 @@ func (r *Route) JoinChat(manager map[int]*chat.Chat) echo.HandlerFunc {
 				Leave:    make(chan *chat.User),
 				Id:       chatID,
 			}
+			/*
+				caso 1 : el chat fue creado antes pero no existe un canal
+
+				caso 2 : nuevo chat en la base de datos porque se mando el username del receiver
+			*/
 			if receiverID != -1 {
-				//solo debo crear un chat cuando el receiverID sea diferente a -1
-				//en caso el id sea -1 significa que el front ya tiene registrado este chat y solo
-				//falta crear el canal no es necesario crear el chat
 				//TODO: verificar si el chat por crear ya existe
 				chatEnt, err := r.db.Chat.Create().
 					SetType("public").
@@ -100,12 +102,10 @@ func (r *Route) JoinChat(manager map[int]*chat.Chat) echo.HandlerFunc {
 					log.Println("Error al crear chat en bd")
 					log.Println(err)
 				}
-
-				manager[chatEnt.ID] = newRoom
-			} else {
-				manager[chatID] = newRoom
+				chatID = chatEnt.ID
 			}
 
+			manager[chatID] = newRoom
 			go newRoom.Run()
 
 			user := &chat.User{
@@ -115,7 +115,7 @@ func (r *Route) JoinChat(manager map[int]*chat.Chat) echo.HandlerFunc {
 			}
 
 			newRoom.Join <- user
-			user.Read(r.db, userClient)
+			user.Read(r.db, userClient, chatID)
 		}
 		return nil
 	}
