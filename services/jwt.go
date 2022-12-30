@@ -1,6 +1,7 @@
-package route
+package services
 
 import (
+	"github.com/amaru0601/fluent/models"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -15,15 +16,16 @@ type JwtClaims struct {
 	jwt.StandardClaims
 }
 
-func makeToken(user *UserSignIn) (string, error) {
+func makeToken(cred models.Credentials) (string, error) {
 	jwtClaims := JwtClaims{
-		Username: user.Username,
+		Username: cred.Username,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
 		},
 	}
-	jwtoken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtClaims)
 
-	ss, err := jwtoken.SignedString(MySigningKey)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtClaims)
+
+	ss, err := token.SignedString(MySigningKey)
 	return ss, err
 }

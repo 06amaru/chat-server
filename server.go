@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/amaru0601/fluent/services"
 	"log"
 	"net/http"
 	"strconv"
@@ -40,22 +41,12 @@ func main() {
 	// Echo instance
 	e := echo.New()
 	e.Use(middleware.CORS())
-	// Ent client
-	entClient, err := db.GetClient()
-	if err != nil {
-		log.Panicln("Database could not initialize")
-	}
 
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
 	r := route.NewRoute(entClient)
-
-	// Route => handler
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!\n")
-	})
 
 	// encargado de almacenar las direcciones de memoria de los chats para luego poder conectarse
 	var manager = make(map[int]*chat.Chat)
@@ -76,7 +67,7 @@ func main() {
 		}
 		fluent := api.Group("/fluent")
 		{
-			fluent.Use(middleware.JWT(route.MySigningKey))
+			fluent.Use(middleware.JWT(services.MySigningKey))
 
 			fluent.GET("/members", func(c echo.Context) error {
 				chatID, _ := strconv.Atoi(c.QueryParam("chatID"))

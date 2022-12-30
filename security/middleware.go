@@ -3,9 +3,9 @@ package security
 import (
 	"errors"
 	"fmt"
+	"github.com/amaru0601/fluent/services"
 	"reflect"
 
-	"github.com/amaru0601/fluent/route"
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -15,7 +15,7 @@ func CustomMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	config := middleware.DefaultJWTConfig
 	return func(c echo.Context) error {
 		param := c.QueryParam("jwt")
-		config.SigningKey = route.MySigningKey
+		config.SigningKey = services.MySigningKey
 
 		defaultKeyFunc := func(t *jwt.Token) (interface{}, error) {
 			// Check the signing method
