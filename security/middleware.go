@@ -36,7 +36,7 @@ func CustomMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 		config.KeyFunc = defaultKeyFunc
 
-		token, err := parseToken(param, c, config)
+		token, err := parseToken(param, config)
 
 		if err == nil {
 			// Store user information from token into context.
@@ -60,7 +60,7 @@ func CustomMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func parseToken(auth string, c echo.Context, config middleware.JWTConfig) (interface{}, error) {
+func parseToken(auth string, config middleware.JWTConfig) (interface{}, error) {
 	token_ := new(jwt.Token)
 	var err error
 	if _, ok := config.Claims.(jwt.MapClaims); ok {
