@@ -8,7 +8,6 @@ RUN mkdir /app
 WORKDIR /app
 
 COPY . .
-COPY .env .
 
 # Download all the dependencies
 RUN go get -d -v ./...

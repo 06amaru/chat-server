@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 
@@ -9,18 +10,18 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var postgresClient *ent.Client
+//var postgresClient *ent.Client
 
 func GetPostgresClient() *ent.Client {
 
-	// TODO definir variables de entorno para desarrollo local y dockercompose
-	log.Println(os.Getenv("DB_HOST"))
-	log.Println(os.Getenv("DB_PORT"))
-	log.Println(os.Getenv("DB_NAME"))
-	log.Println(os.Getenv("DB_USER"))
-	log.Println(os.Getenv("DB_PASSWORD"))
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+	dbUser := os.Getenv("DB_USER")
+	dbPassword := os.Getenv("DB_PASSWORD")
 
-	client, err := ent.Open("postgres", "host=db.bcoyyczdpsaoazwywotk.supabase.co port=5432 user=postgres dbname=postgres password=G3ZcEtGQUr3Kn90A sslmode=disable")
+	connectionString := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable", dbHost, dbPort, dbUser, dbName, dbPassword)
+	client, err := ent.Open("postgres", connectionString)
 	if err != nil {
 		log.Printf("failed opening connection to postgres: %v", err)
 		panic(err)

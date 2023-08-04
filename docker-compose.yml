@@ -8,7 +8,8 @@ services:
       - POSTGRES_DB=${DB_NAME}
       - DATABASE_HOST=${DB_HOST}
       - DATABASE_PORT=${DB_PORT}
-
+    env_file:
+      - .env
     tty: true
     build: .
     ports:
@@ -17,10 +18,10 @@ services:
     volumes:
       - .:/app
     depends_on:
-      - postgresdb
+      postgresdb:
+        condition: service_healthy
     networks:
       - internal
-
   postgresdb:
     image: postgres:latest
     container_name: postgres_container
@@ -29,12 +30,17 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
       - DATABASE_HOST=${DB_HOST}
+    env_file:
+      - .env
     ports:
       - '1234:5432'
     networks:
       - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
 networks:
   internal:
     driver: bridge
-  
-    
