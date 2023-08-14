@@ -35,5 +35,5 @@ func main() {
 	sockets.GET("/create-chat", chatController.CreateChat)
 
 	// Start server
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(":8080"))
 }
