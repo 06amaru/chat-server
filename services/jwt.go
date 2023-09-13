@@ -1,14 +1,15 @@
 package services
 
 import (
-	"github.com/amaru0601/fluent/models"
 	"time"
+
+	"github.com/amaru0601/fluent/models"
 
 	"github.com/golang-jwt/jwt"
 )
 
 var (
-	MySigningKey = []byte("Ja0ks0nE")
+	MySigningKey []byte
 )
 
 type JwtClaims struct {

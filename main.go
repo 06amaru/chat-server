@@ -1,11 +1,18 @@
 package main
 
 import (
+	"os"
+
 	"github.com/amaru0601/fluent/controllers"
+	"github.com/amaru0601/fluent/security"
 	"github.com/amaru0601/fluent/services"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
+
+func init() {
+	services.MySigningKey = []byte(os.Getenv("SIGNING_KEY"))
+}
 
 func main() {
 	// Echo instance
@@ -31,6 +38,7 @@ func main() {
 	//TODO: Hacer endpoint para jalar todos los mensajes
 
 	sockets := e.Group("/ws")
+	sockets.Use(security.CustomMiddleware)
 	sockets.GET("/join", chatController.JoinChat)
 	sockets.GET("/create-chat", chatController.CreateChat)
 

@@ -2,41 +2,42 @@ package security
 
 import (
 	"errors"
-	"fmt"
-	"github.com/amaru0601/fluent/services"
 	"reflect"
+
+	"github.com/amaru0601/fluent/services"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
+var config = middleware.DefaultJWTConfig
+
+/*func getSigningKey(token *jwt.Token) (interface{}, error) {
+	if token.Method.Alg() != config.SigningMethod {
+		return nil, fmt.Errorf("unexpected jwt signing method=%v", token.Header["alg"])
+	}
+
+	if len(config.SigningKeys) > 0 {
+		// https://www.rfc-editor.org/rfc/rfc7515#section-4.1.4
+		if kid, ok := token.Header["kid"].(string); ok {
+			if key, ok := config.SigningKeys[kid]; ok {
+				return key, nil
+			}
+		}
+		return nil, fmt.Errorf("unexpected jwt key id=%v", token.Header["kid"])
+	}
+
+	return config.SigningKey, nil
+}*/
+
 func CustomMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
-	config := middleware.DefaultJWTConfig
 	return func(c echo.Context) error {
 		param := c.QueryParam("jwt")
 		config.SigningKey = services.MySigningKey
+		//config.KeyFunc = getSigningKey
 
-		defaultKeyFunc := func(t *jwt.Token) (interface{}, error) {
-			// Check the signing method
-			if t.Method.Alg() != config.SigningMethod {
-				return nil, fmt.Errorf("unexpected jwt signing method=%v", t.Header["alg"])
-			}
-			if len(config.SigningKeys) > 0 {
-				if kid, ok := t.Header["kid"].(string); ok {
-					if key, ok := config.SigningKeys[kid]; ok {
-						return key, nil
-					}
-				}
-				return nil, fmt.Errorf("unexpected jwt key id=%v", t.Header["kid"])
-			}
-
-			return config.SigningKey, nil
-		}
-
-		config.KeyFunc = defaultKeyFunc
-
-		token, err := parseToken(param, config)
+		token, err := parseToken(param)
 
 		if err == nil {
 			// Store user information from token into context.
@@ -60,7 +61,7 @@ func CustomMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func parseToken(auth string, config middleware.JWTConfig) (interface{}, error) {
+func parseToken(auth string) (interface{}, error) {
 	token_ := new(jwt.Token)
 	var err error
 	if _, ok := config.Claims.(jwt.MapClaims); ok {

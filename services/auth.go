@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+
 	"github.com/amaru0601/fluent/models"
 	"github.com/amaru0601/fluent/repository"
 )
@@ -40,5 +41,3 @@ func (svc AuthService) SignIn(cred models.Credentials) (string, error) {
 
 	return token, nil
 }
-
-
