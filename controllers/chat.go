@@ -77,7 +77,9 @@ func (ctrl ChatController) CreateChat(c echo.Context) error {
 	defer ws.Close()
 
 	to := c.QueryParam("to")
-	from := c.QueryParam("from")
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	from := claims["username"].(string)
 
 	err = ctrl.svc.CreateChat(to, from, ws)
 	if err != nil {

@@ -28,7 +28,7 @@ func (ctrl AuthController) SignUp(c echo.Context) error {
 
 	err := ctrl.service.SignUp(*user)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
+		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
 	return c.NoContent(http.StatusAccepted)

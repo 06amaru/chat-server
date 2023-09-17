@@ -2,6 +2,7 @@ package security
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 
 	"github.com/amaru0601/fluent/services"
@@ -13,7 +14,7 @@ import (
 
 var config = middleware.DefaultJWTConfig
 
-/*func getSigningKey(token *jwt.Token) (interface{}, error) {
+func getSigningKey(token *jwt.Token) (interface{}, error) {
 	if token.Method.Alg() != config.SigningMethod {
 		return nil, fmt.Errorf("unexpected jwt signing method=%v", token.Header["alg"])
 	}
@@ -29,15 +30,20 @@ var config = middleware.DefaultJWTConfig
 	}
 
 	return config.SigningKey, nil
-}*/
+}
 
 func CustomMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		param := c.QueryParam("jwt")
+		var data string
+		for _, cookie := range c.Cookies() {
+			if cookie != nil && (*cookie).Name == "token" {
+				data = (*cookie).Value
+			}
+		}
 		config.SigningKey = services.MySigningKey
-		//config.KeyFunc = getSigningKey
+		config.KeyFunc = getSigningKey
 
-		token, err := parseToken(param)
+		token, err := parseToken(data)
 
 		if err == nil {
 			// Store user information from token into context.
@@ -61,15 +67,15 @@ func CustomMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func parseToken(auth string) (interface{}, error) {
+func parseToken(token string) (interface{}, error) {
 	token_ := new(jwt.Token)
 	var err error
 	if _, ok := config.Claims.(jwt.MapClaims); ok {
-		token_, err = jwt.Parse(auth, config.KeyFunc)
+		token_, err = jwt.Parse(token, config.KeyFunc)
 	} else {
 		t := reflect.ValueOf(config.Claims).Type().Elem()
 		claims := reflect.New(t).Interface().(jwt.Claims)
-		token_, err = jwt.ParseWithClaims(auth, claims, config.KeyFunc)
+		token_, err = jwt.ParseWithClaims(token, claims, config.KeyFunc)
 	}
 	if err != nil {
 		return nil, err

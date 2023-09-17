@@ -55,13 +55,12 @@ func (svc ChatService) CreateChat(to, from string, ws *websocket.Conn) error {
 		return err
 	}
 
-	// chat already exists
-	chat, err := svc.repo.FindChatByUsernames(to, from)
-	if err != nil || chat != nil {
+	err = svc.existChat(to, from)
+	if err != nil {
 		return err
 	}
 
-	chat, err = svc.repo.CreateChat(receiver.ID, sender.ID)
+	chat, err := svc.repo.CreateChat(receiver.ID, sender.ID)
 	if err != nil {
 		return err
 	}
@@ -87,6 +86,19 @@ func (svc ChatService) CreateChat(to, from string, ws *websocket.Conn) error {
 	user.Read(svc.repo.Client, sender, chat.ID)
 
 	return nil
+}
+
+func (svc ChatService) existChat(to, from string) error {
+	chat, err := svc.repo.FindChatByUsernames(to, from)
+	if chat != nil {
+		return fmt.Errorf("chat already exists")
+	}
+	switch err.(type) {
+	case *ent.NotFoundError:
+		return nil
+	default:
+		return err
+	}
 }
 
 func (svc ChatService) JoinChat(chatID int, username string, ws *websocket.Conn) error {
