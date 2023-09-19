@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	apiChat "github.com/amaru0601/fluent/chat"
 	"github.com/amaru0601/fluent/ent"
 	"github.com/amaru0601/fluent/models"
@@ -15,7 +14,7 @@ type ChatService struct {
 }
 
 func NewChatService(repo *repository.Repository) ChatService {
-	return ChatService{repo: repo}
+	return ChatService{repo: repo, chats: map[int]*apiChat.Chat{}}
 }
 
 func (svc ChatService) GetMembers(chatID int) ([]models.User, error) {
@@ -44,27 +43,81 @@ func (svc ChatService) GetChats(username string) ([]*ent.Chat, error) {
 	return chats, nil
 }
 
-func (svc ChatService) CreateChat(to, from string, ws *websocket.Conn) error {
+type ChatModel struct {
+	Chat     *ent.Chat
+	Receiver *ent.User
+	Sender   *ent.User
+}
+
+func (svc ChatService) VerifyChat(to, from string) (*ChatModel, error) {
 	receiver, err := svc.repo.FindUser(to)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	sender, err := svc.repo.FindUser(from)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	err = svc.existChat(to, from)
+	chat, err := svc.existChat(to, from)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ChatModel{
+		Chat:     chat,
+		Receiver: receiver,
+		Sender:   sender,
+	}, nil
+}
+
+func (svc ChatService) CreateChat(sender, receiver *ent.User, ws *websocket.Conn) error {
+	chat, err := svc.repo.CreateChat(sender.ID, receiver.ID)
 	if err != nil {
 		return err
 	}
 
-	chat, err := svc.repo.CreateChat(receiver.ID, sender.ID)
+	svc.runChat(sender, ws, chat)
+
+	return nil
+}
+
+func (svc ChatService) existChat(to, from string) (*ent.Chat, error) {
+	chat, err := svc.repo.FindChatByUsernames(to, from)
+	if chat != nil {
+		return chat, nil
+	}
+	return nil, err
+}
+
+func (svc ChatService) JoinChat(chatID int, sender string, ws *websocket.Conn) error {
+	user, err := svc.repo.FindUser(sender)
 	if err != nil {
 		return err
 	}
 
+	chat, err := svc.repo.FindChatByID(chatID, sender)
+	if err != nil {
+		return err
+	}
+
+	if room, ok := svc.chats[chatID]; ok {
+		newUser := &apiChat.User{
+			Username: sender,
+			Conn:     ws,
+			Room:     room,
+		}
+		room.Join <- newUser
+		newUser.Read(svc.repo.Client, user, chatID)
+	} else {
+		svc.runChat(user, ws, chat)
+	}
+
+	return nil
+}
+
+func (svc ChatService) runChat(user *ent.User, ws *websocket.Conn, chat *ent.Chat) {
 	newRoom := &apiChat.Chat{
 		Users:    make(map[string]*apiChat.User),
 		Messages: make(chan *apiChat.Message),
@@ -76,47 +129,12 @@ func (svc ChatService) CreateChat(to, from string, ws *websocket.Conn) error {
 	svc.chats[chat.ID] = newRoom
 	go newRoom.Run()
 
-	user := &apiChat.User{
-		Username: from,
+	newUser := &apiChat.User{
+		Username: user.Username,
 		Conn:     ws,
 		Room:     newRoom,
 	}
 
-	newRoom.Join <- user
-	user.Read(svc.repo.Client, sender, chat.ID)
-
-	return nil
-}
-
-func (svc ChatService) existChat(to, from string) error {
-	chat, err := svc.repo.FindChatByUsernames(to, from)
-	if chat != nil {
-		return fmt.Errorf("chat already exists")
-	}
-	switch err.(type) {
-	case *ent.NotFoundError:
-		return nil
-	default:
-		return err
-	}
-}
-
-func (svc ChatService) JoinChat(chatID int, username string, ws *websocket.Conn) error {
-	user, err := svc.repo.FindUser(username)
-	if err != nil {
-		return err
-	}
-
-	if room, ok := svc.chats[chatID]; ok {
-		userChat := &apiChat.User{
-			Username: username,
-			Conn:     ws,
-			Room:     room,
-		}
-		room.Join <- userChat
-		userChat.Read(svc.repo.Client, user, chatID)
-		return nil
-	} else {
-		return fmt.Errorf("chat not found")
-	}
+	newRoom.Join <- newUser
+	newUser.Read(svc.repo.Client, user, chat.ID)
 }

@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"fmt"
+	"github.com/amaru0601/fluent/ent"
 	"github.com/amaru0601/fluent/repository"
 	"github.com/amaru0601/fluent/services"
 	"github.com/golang-jwt/jwt"
@@ -70,18 +72,27 @@ func (ctrl ChatController) GetChats(c echo.Context) error {
 }
 
 func (ctrl ChatController) CreateChat(c echo.Context) error {
+	to := c.QueryParam("to")
+	token := c.Get("user").(*jwt.Token)
+	from := token.Claims.(jwt.MapClaims)["username"].(string)
+
+	chat, err := ctrl.svc.VerifyChat(to, from)
+	if chat != nil {
+		return c.JSON(http.StatusBadRequest, chat)
+	}
+	switch err.(type) {
+	case *ent.NotFoundError:
+		fmt.Println("this chat can be created")
+	default:
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
 	ws, err := Upgrade(c.Response(), c.Request())
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 	defer ws.Close()
-
-	to := c.QueryParam("to")
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	from := claims["username"].(string)
-
-	err = ctrl.svc.CreateChat(to, from, ws)
+	err = ctrl.svc.CreateChat(chat.Receiver, chat.Sender, ws)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
@@ -101,9 +112,10 @@ func (ctrl ChatController) JoinChat(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
-	username := c.QueryParam("username")
+	token := c.Get("user").(*jwt.Token)
+	from := token.Claims.(jwt.MapClaims)["username"].(string)
 
-	err = ctrl.svc.JoinChat(chatID, username, ws)
+	err = ctrl.svc.JoinChat(chatID, from, ws)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}

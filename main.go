@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"os"
 
 	"github.com/amaru0601/fluent/controllers"
@@ -17,7 +18,11 @@ func init() {
 func main() {
 	// Echo instance
 	e := echo.New()
-	e.Use(middleware.CORS())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowCredentials: true,
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
+	}))
 
 	// Middleware
 	e.Use(middleware.Logger())
@@ -32,7 +37,7 @@ func main() {
 
 	chatController := controllers.NewChatController()
 	protected := e.Group("/api")
-	protected.Use(middleware.JWT(services.MySigningKey))
+	protected.Use(security.CustomMiddleware)
 	protected.GET("/members", chatController.GetMembers)
 	protected.GET("/chats", chatController.GetChats)
 	//TODO: Hacer endpoint para jalar todos los mensajes

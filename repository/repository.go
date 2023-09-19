@@ -83,9 +83,25 @@ func (repo Repository) GetChats(username string) ([]*ent.Chat, error) {
 func (repo Repository) FindChatByUsernames(to, from string) (*ent.Chat, error) {
 	chat, err := repo.Client.Chat.
 		Query().
-		Where(chatEnt.HasMembersWith(
-			userEnt.Username(to),
-			userEnt.Username(from),
+		Where(chatEnt.And(
+			chatEnt.HasMembersWith(userEnt.UsernameEQ(to)),
+			chatEnt.HasMembersWith(userEnt.UsernameEQ(from)),
+		)).
+		Only(context.Background())
+
+	if err != nil {
+		return nil, err
+	}
+
+	return chat, nil
+}
+
+func (repo Repository) FindChatByID(chatID int, from string) (*ent.Chat, error) {
+	chat, err := repo.Client.Chat.
+		Query().
+		Where(chatEnt.And(
+			chatEnt.HasMembersWith(userEnt.UsernameEQ(from)),
+			chatEnt.ID(chatID),
 		)).
 		Only(context.Background())
 
