@@ -50,7 +50,3 @@ func (c *Chat) disconnect(user *User) {
 		c.broadcast(NewMessage(body, "Server"))
 	}
 }
-
-func (c *Chat) GetMessages(chatID int) {
-
-}
