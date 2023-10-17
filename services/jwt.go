@@ -21,7 +21,7 @@ func makeToken(cred models.Credentials) (string, error) {
 	jwtClaims := JwtClaims{
 		Username: cred.Username,
 		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+			ExpiresAt: time.Now().Add(time.Second * 24 * 60 * 60).Unix(),
 		},
 	}
 

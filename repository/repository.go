@@ -66,18 +66,29 @@ func (repo Repository) GetChatMembers(chatID int) ([]*ent.User, error) {
 	return members, nil
 }
 
-func (repo Repository) GetChats(username string) ([]*ent.Chat, error) {
-	user, err := repo.Client.User.Query().Where(userEnt.UsernameEQ(username)).First(context.Background())
+func (repo Repository) GetChats(username string) ([]*models.Chat, error) {
+	user, err := repo.Client.User.Query().Where(userEnt.UsernameEQ(username)).
+		WithChats(func(query *ent.ChatQuery) {
+			query.WithMembers()
+		}).First(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
-	chats, err := user.QueryChats().All(context.Background())
-	if err != nil {
-		return nil, err
+	var response []*models.Chat
+	for _, chat := range user.Edges.Chats {
+		for _, member := range chat.Edges.Members {
+			if member.Username != username {
+				newChat := &models.Chat{
+					ChatID: chat.ID,
+					Sender: member.Username,
+				}
+				response = append(response, newChat)
+			}
+		}
 	}
 
-	return chats, nil
+	return response, nil
 }
 
 func (repo Repository) FindChatByUsernames(to, from string) (*ent.Chat, error) {
