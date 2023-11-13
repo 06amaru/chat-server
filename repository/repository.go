@@ -2,9 +2,11 @@ package repository
 
 import (
 	"context"
+
 	"github.com/amaru0601/fluent/db"
 	"github.com/amaru0601/fluent/ent"
 	chatEnt "github.com/amaru0601/fluent/ent/chat"
+	"github.com/amaru0601/fluent/ent/message"
 	userEnt "github.com/amaru0601/fluent/ent/user"
 	"github.com/amaru0601/fluent/models"
 )
@@ -133,4 +135,20 @@ func (repo Repository) CreateChat(to, from int) (*ent.Chat, error) {
 	}
 
 	return chat, nil
+}
+
+func (repo Repository) GetMessages(chatID, limit, offset int) (*ent.Message, error) {
+	chat, err := repo.Client.Chat.Query().Where(chatEnt.ID(chatID)).Only(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	messages, err := repo.Client.Chat.QueryMessages(chat).
+		Limit(limit).
+		Offset(offset).
+		Order(ent.Desc(message.FieldCreatedAt)).
+		Only(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	return messages, nil
 }

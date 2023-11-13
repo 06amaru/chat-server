@@ -2,14 +2,15 @@ package controllers
 
 import (
 	"fmt"
+	"net/http"
+	"strconv"
+
 	"github.com/amaru0601/fluent/ent"
 	"github.com/amaru0601/fluent/repository"
 	"github.com/amaru0601/fluent/services"
 	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
-	"net/http"
-	"strconv"
 )
 
 func Upgrade(w http.ResponseWriter, r *http.Request) (*websocket.Conn, error) {
@@ -56,6 +57,45 @@ func (ctrl ChatController) GetMembers(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, members)
+}
+
+func (ctrl ChatController) GetMessages(c echo.Context) error {
+	chatID := c.Param("chatID")
+	if chatID == "" {
+		return c.JSON(http.StatusBadRequest, fmt.Errorf("there is no chat id found"))
+	}
+
+	chatIDInt, err := strconv.Atoi(chatID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, fmt.Errorf("chat id is not a number"))
+	}
+
+	limit := c.Param("limit")
+	if limit == "" {
+		return c.JSON(http.StatusBadRequest, fmt.Errorf("limit required"))
+	}
+
+	limitInt, err := strconv.Atoi(limit)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, fmt.Errorf("limit is not a number"))
+	}
+
+	offset := c.Param("offset")
+	if offset == "" {
+		return c.JSON(http.StatusBadRequest, fmt.Errorf("offset required"))
+	}
+
+	offsetInt, err := strconv.Atoi(offset)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, fmt.Errorf("offset is not a number"))
+	}
+
+	messages, err := ctrl.svc.GetMessages(chatIDInt, limitInt, offsetInt)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err)
+	}
+
+	return c.JSON(http.StatusOK, messages)
 }
 
 func (ctrl ChatController) GetChats(c echo.Context) error {

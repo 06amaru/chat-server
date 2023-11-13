@@ -38,9 +38,10 @@ func main() {
 	chatController := controllers.NewChatController()
 	protected := e.Group("/api")
 	protected.Use(security.CustomMiddleware)
-	protected.GET("/members", chatController.GetMembers)
+	//protected.GET("/members", chatController.GetMembers)
 	protected.GET("/chats", chatController.GetChats)
 	//TODO: Hacer endpoint para jalar todos los mensajes
+	protected.GET("/:chatID/messages", chatController.GetMessages)
 
 	sockets := e.Group("/ws")
 	sockets.Use(security.CustomMiddleware)

@@ -34,6 +34,15 @@ func (svc ChatService) GetMembers(chatID int) ([]models.User, error) {
 	return membersArr, nil
 }
 
+func (svc ChatService) GetMessages(chatID, limit, offset int) (interface{}, error) {
+	messages, err := svc.repo.GetMessages(chatID, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	return messages, nil
+}
+
 func (svc ChatService) GetChats(username string) ([]*models.Chat, error) {
 	chats, err := svc.repo.GetChats(username)
 	if err != nil {
