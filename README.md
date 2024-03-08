@@ -1,4 +1,4 @@
-# Channels
+# Chat Server
 
 Chat using websockets and concurrency by channels.
 
