@@ -5,12 +5,12 @@ package enttest
 import (
 	"context"
 
-	"github.com/amaru0601/channels/ent"
+	"github.com/jaox1/chat-server/ent"
 	// required by schema hooks.
-	_ "github.com/amaru0601/channels/ent/runtime"
+	_ "github.com/jaox1/chat-server/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
-	"github.com/amaru0601/channels/ent/migrate"
+	"github.com/jaox1/chat-server/ent/migrate"
 )
 
 type (

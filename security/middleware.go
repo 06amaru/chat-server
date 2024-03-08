@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/amaru0601/channels/services"
+	"github.com/jaox1/chat-server/services"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"

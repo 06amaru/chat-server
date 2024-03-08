@@ -8,7 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/amaru0601/channels/ent/chat"
+	"github.com/jaox1/chat-server/ent/chat"
 )
 
 // Chat is the model entity for the Chat schema.

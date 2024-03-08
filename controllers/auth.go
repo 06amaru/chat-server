@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"github.com/amaru0601/channels/models"
-	"github.com/amaru0601/channels/repository"
-	"github.com/amaru0601/channels/services"
+	"github.com/jaox1/chat-server/models"
+	"github.com/jaox1/chat-server/repository"
+	"github.com/jaox1/chat-server/services"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )

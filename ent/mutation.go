@@ -11,10 +11,10 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/amaru0601/channels/ent/chat"
-	"github.com/amaru0601/channels/ent/message"
-	"github.com/amaru0601/channels/ent/predicate"
-	"github.com/amaru0601/channels/ent/user"
+	"github.com/jaox1/chat-server/ent/chat"
+	"github.com/jaox1/chat-server/ent/message"
+	"github.com/jaox1/chat-server/ent/predicate"
+	"github.com/jaox1/chat-server/ent/user"
 )
 
 const (

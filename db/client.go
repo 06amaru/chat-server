@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/amaru0601/channels/ent"
+	"github.com/jaox1/chat-server/ent"
 	_ "github.com/lib/pq"
 )
 

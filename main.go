@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/amaru0601/channels/controllers"
-	"github.com/amaru0601/channels/security"
-	"github.com/amaru0601/channels/services"
+	"github.com/jaox1/chat-server/controllers"
+	"github.com/jaox1/chat-server/security"
+	"github.com/jaox1/chat-server/services"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )

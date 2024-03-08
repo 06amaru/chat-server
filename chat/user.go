@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/amaru0601/channels/ent"
 	"github.com/gorilla/websocket"
+	"github.com/jaox1/chat-server/ent"
 )
 
 type User struct {

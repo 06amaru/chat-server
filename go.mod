@@ -1,4 +1,4 @@
-module github.com/amaru0601/channels
+module github.com/jaox1/chat-server
 
 go 1.20
 

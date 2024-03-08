@@ -3,11 +3,11 @@ package services
 import (
 	"errors"
 	"fmt"
-	apiChat "github.com/amaru0601/channels/chat"
-	"github.com/amaru0601/channels/ent"
-	"github.com/amaru0601/channels/models"
-	"github.com/amaru0601/channels/repository"
 	"github.com/gorilla/websocket"
+	apiChat "github.com/jaox1/chat-server/chat"
+	"github.com/jaox1/chat-server/ent"
+	"github.com/jaox1/chat-server/models"
+	"github.com/jaox1/chat-server/repository"
 )
 
 type ChatService struct {

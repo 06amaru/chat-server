@@ -9,8 +9,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/amaru0601/channels/ent/message"
-	"github.com/amaru0601/channels/ent/user"
+	"github.com/jaox1/chat-server/ent/message"
+	"github.com/jaox1/chat-server/ent/user"
 )
 
 // Message is the model entity for the Message schema.

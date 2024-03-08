@@ -3,8 +3,8 @@ package services
 import (
 	"fmt"
 
-	"github.com/amaru0601/channels/models"
-	"github.com/amaru0601/channels/repository"
+	"github.com/jaox1/chat-server/models"
+	"github.com/jaox1/chat-server/repository"
 )
 
 type AuthService struct {

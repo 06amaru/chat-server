@@ -8,8 +8,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/amaru0601/channels/ent/chat"
-	"github.com/amaru0601/channels/ent/predicate"
+	"github.com/jaox1/chat-server/ent/chat"
+	"github.com/jaox1/chat-server/ent/predicate"
 )
 
 // ChatDelete is the builder for deleting a Chat entity.

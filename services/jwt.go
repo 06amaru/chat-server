@@ -3,7 +3,7 @@ package services
 import (
 	"time"
 
-	"github.com/amaru0601/channels/models"
+	"github.com/jaox1/chat-server/models"
 
 	"github.com/golang-jwt/jwt"
 )
