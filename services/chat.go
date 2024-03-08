@@ -1,10 +1,12 @@
 package services
 
 import (
-	apiChat "github.com/amaru0601/fluent/chat"
-	"github.com/amaru0601/fluent/ent"
-	"github.com/amaru0601/fluent/models"
-	"github.com/amaru0601/fluent/repository"
+	"errors"
+	"fmt"
+	apiChat "github.com/amaru0601/channels/chat"
+	"github.com/amaru0601/channels/ent"
+	"github.com/amaru0601/channels/models"
+	"github.com/amaru0601/channels/repository"
 	"github.com/gorilla/websocket"
 )
 
@@ -71,14 +73,21 @@ func (svc ChatService) VerifyChat(to, from string) (*ChatModel, error) {
 
 	chat, err := svc.existChat(to, from)
 	if err != nil {
-		return nil, err
+		var notFoundError *ent.NotFoundError
+		switch {
+		case errors.As(err, &notFoundError):
+			fmt.Println("this chat can be created")
+			return &ChatModel{
+				Chat:     chat,
+				Receiver: receiver,
+				Sender:   sender,
+			}, nil
+		default:
+			return nil, err
+		}
 	}
 
-	return &ChatModel{
-		Chat:     chat,
-		Receiver: receiver,
-		Sender:   sender,
-	}, nil
+	return nil, fmt.Errorf("chat with ID %d exists between %s and %s", chat.ID, to, from)
 }
 
 func (svc ChatService) CreateChat(sender, receiver *ent.User, ws *websocket.Conn) error {

@@ -5,12 +5,12 @@ package enttest
 import (
 	"context"
 
-	"github.com/amaru0601/fluent/ent"
+	"github.com/amaru0601/channels/ent"
 	// required by schema hooks.
-	_ "github.com/amaru0601/fluent/ent/runtime"
+	_ "github.com/amaru0601/channels/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
-	"github.com/amaru0601/fluent/ent/migrate"
+	"github.com/amaru0601/channels/ent/migrate"
 )
 
 type (

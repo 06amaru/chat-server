@@ -3,12 +3,12 @@ package repository
 import (
 	"context"
 
-	"github.com/amaru0601/fluent/db"
-	"github.com/amaru0601/fluent/ent"
-	chatEnt "github.com/amaru0601/fluent/ent/chat"
-	"github.com/amaru0601/fluent/ent/message"
-	userEnt "github.com/amaru0601/fluent/ent/user"
-	"github.com/amaru0601/fluent/models"
+	"github.com/amaru0601/channels/db"
+	"github.com/amaru0601/channels/ent"
+	chatEnt "github.com/amaru0601/channels/ent/chat"
+	"github.com/amaru0601/channels/ent/message"
+	userEnt "github.com/amaru0601/channels/ent/user"
+	"github.com/amaru0601/channels/models"
 )
 
 type Repository struct {

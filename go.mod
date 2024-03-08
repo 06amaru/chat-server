@@ -1,4 +1,4 @@
-module github.com/amaru0601/fluent
+module github.com/amaru0601/channels
 
 go 1.20
 

@@ -3,8 +3,8 @@ package services
 import (
 	"fmt"
 
-	"github.com/amaru0601/fluent/models"
-	"github.com/amaru0601/fluent/repository"
+	"github.com/amaru0601/channels/models"
+	"github.com/amaru0601/channels/repository"
 )
 
 type AuthService struct {

@@ -9,8 +9,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/amaru0601/fluent/ent/message"
-	"github.com/amaru0601/fluent/ent/user"
+	"github.com/amaru0601/channels/ent/message"
+	"github.com/amaru0601/channels/ent/user"
 )
 
 // Message is the model entity for the Message schema.

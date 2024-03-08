@@ -9,9 +9,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/amaru0601/fluent/ent/chat"
-	"github.com/amaru0601/fluent/ent/message"
-	"github.com/amaru0601/fluent/ent/user"
+	"github.com/amaru0601/channels/ent/chat"
+	"github.com/amaru0601/channels/ent/message"
+	"github.com/amaru0601/channels/ent/user"
 )
 
 // ChatCreate is the builder for creating a Chat entity.

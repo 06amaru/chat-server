@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/amaru0601/fluent/ent/user"
+	"github.com/amaru0601/channels/ent/user"
 )
 
 // User is the model entity for the User schema.

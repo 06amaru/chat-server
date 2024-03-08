@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/amaru0601/fluent/ent"
+	"github.com/amaru0601/channels/ent"
 )
 
 // The ChatFunc type is an adapter to allow the use of ordinary

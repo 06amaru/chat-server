@@ -5,9 +5,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/amaru0601/fluent/ent"
-	"github.com/amaru0601/fluent/repository"
-	"github.com/amaru0601/fluent/services"
+	"github.com/amaru0601/channels/repository"
+	"github.com/amaru0601/channels/services"
 	"github.com/golang-jwt/jwt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -117,13 +116,7 @@ func (ctrl ChatController) CreateChat(c echo.Context) error {
 	from := token.Claims.(jwt.MapClaims)["username"].(string)
 
 	chat, err := ctrl.svc.VerifyChat(to, from)
-	if chat != nil {
-		return c.JSON(http.StatusBadRequest, chat)
-	}
-	switch err.(type) {
-	case *ent.NotFoundError:
-		fmt.Println("this chat can be created")
-	default:
+	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 

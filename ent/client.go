@@ -8,15 +8,15 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/amaru0601/fluent/ent/migrate"
+	"github.com/amaru0601/channels/ent/migrate"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/amaru0601/fluent/ent/chat"
-	"github.com/amaru0601/fluent/ent/message"
-	"github.com/amaru0601/fluent/ent/user"
+	"github.com/amaru0601/channels/ent/chat"
+	"github.com/amaru0601/channels/ent/message"
+	"github.com/amaru0601/channels/ent/user"
 )
 
 // Client is the client that holds all ent builders.

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/amaru0601/fluent/services"
+	"github.com/amaru0601/channels/services"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
@@ -67,21 +67,21 @@ func CustomMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func parseToken(token string) (interface{}, error) {
-	token_ := new(jwt.Token)
+func parseToken(tokenStr string) (interface{}, error) {
+	token := new(jwt.Token)
 	var err error
 	if _, ok := config.Claims.(jwt.MapClaims); ok {
-		token_, err = jwt.Parse(token, config.KeyFunc)
+		token, err = jwt.Parse(tokenStr, config.KeyFunc)
 	} else {
 		t := reflect.ValueOf(config.Claims).Type().Elem()
 		claims := reflect.New(t).Interface().(jwt.Claims)
-		token_, err = jwt.ParseWithClaims(token, claims, config.KeyFunc)
+		token, err = jwt.ParseWithClaims(tokenStr, claims, config.KeyFunc)
 	}
 	if err != nil {
 		return nil, err
 	}
-	if !token_.Valid {
+	if !token.Valid {
 		return nil, errors.New("invalid token")
 	}
-	return token_, nil
+	return token, nil
 }

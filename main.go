@@ -4,9 +4,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/amaru0601/fluent/controllers"
-	"github.com/amaru0601/fluent/security"
-	"github.com/amaru0601/fluent/services"
+	"github.com/amaru0601/channels/controllers"
+	"github.com/amaru0601/channels/security"
+	"github.com/amaru0601/channels/services"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -30,24 +30,29 @@ func main() {
 
 	authController := controllers.NewAuthController()
 	//TODO HASH PASSWORD
-	//curl -X POST -H 'Content-Type: application/json' -d '{"username":"jaoks", "password":"sdtc"}' localhost:1323/register
+	//curl -X POST -H 'Content-Type: application/json' -d '{"username":"jaoks", "password":"sdtc"}' localhost:8081/register
 	e.POST("/register", authController.SignUp)
-	// curl -X POST -H 'Content-Type: application/json' -d '{"username":"jaoks", "password":"sdtc"}' localhost:1323/login
+	// curl -X POST -H 'Content-Type: application/json' -d '{"username":"jaoks", "password":"sdtc"}' localhost:8081/login
 	e.POST("/login", authController.SignIn)
 
 	chatController := controllers.NewChatController()
 	protected := e.Group("/api")
+
 	protected.Use(security.CustomMiddleware)
-	//protected.GET("/members", chatController.GetMembers)
+
+	// curl localhost:8081/api/chats --cookie "token=<YOUR_TOKEN>"
 	protected.GET("/chats", chatController.GetChats)
 	//TODO: Hacer endpoint para jalar todos los mensajes
 	protected.GET("/:chatID/messages", chatController.GetMessages)
 
 	sockets := e.Group("/ws")
 	sockets.Use(security.CustomMiddleware)
+	// websocat "ws://localhost:8081/ws/join?id=<CHAT_ID>" -H "Cookie: token=<YOUR_TOKEN>"
 	sockets.GET("/join", chatController.JoinChat)
+
+	// websocat "ws://localhost:8081/ws/create-chat?to=<USERNAME>" -H "Cookie: token=<YOUR_TOKEN>"
 	sockets.GET("/create-chat", chatController.CreateChat)
 
 	// Start server
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(":8081"))
 }

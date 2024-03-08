@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/amaru0601/fluent/ent"
+	"github.com/amaru0601/channels/ent"
 	_ "github.com/lib/pq"
 )
 
