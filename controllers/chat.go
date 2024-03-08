@@ -69,7 +69,7 @@ func (ctrl ChatController) GetMessages(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, fmt.Errorf("chat id is not a number"))
 	}
 
-	limit := c.Param("limit")
+	limit := c.QueryParam("limit")
 	if limit == "" {
 		return c.JSON(http.StatusBadRequest, fmt.Errorf("limit required"))
 	}
@@ -79,7 +79,7 @@ func (ctrl ChatController) GetMessages(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, fmt.Errorf("limit is not a number"))
 	}
 
-	offset := c.Param("offset")
+	offset := c.QueryParam("offset")
 	if offset == "" {
 		return c.JSON(http.StatusBadRequest, fmt.Errorf("offset required"))
 	}

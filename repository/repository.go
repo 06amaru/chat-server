@@ -137,7 +137,7 @@ func (repo Repository) CreateChat(to, from int) (*ent.Chat, error) {
 	return chat, nil
 }
 
-func (repo Repository) GetMessages(chatID, limit, offset int) (*ent.Message, error) {
+func (repo Repository) GetMessages(chatID, limit, offset int) ([]*ent.Message, error) {
 	chat, err := repo.Client.Chat.Query().Where(chatEnt.ID(chatID)).Only(context.Background())
 	if err != nil {
 		return nil, err
@@ -146,7 +146,7 @@ func (repo Repository) GetMessages(chatID, limit, offset int) (*ent.Message, err
 		Limit(limit).
 		Offset(offset).
 		Order(ent.Desc(message.FieldCreatedAt)).
-		Only(context.Background())
+		All(context.Background())
 	if err != nil {
 		return nil, err
 	}

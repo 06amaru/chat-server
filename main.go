@@ -42,7 +42,8 @@ func main() {
 
 	// curl localhost:8081/api/chats --cookie "token=<YOUR_TOKEN>"
 	protected.GET("/chats", chatController.GetChats)
-	//TODO: Hacer endpoint para jalar todos los mensajes
+
+	// curl "localhost:8081/api/:chatID/messages?limit=5&offset=0" --cookie "token=<YOUR_TOKEN>"
 	protected.GET("/:chatID/messages", chatController.GetMessages)
 
 	sockets := e.Group("/ws")
