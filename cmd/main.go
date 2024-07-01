@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/joho/godotenv"
 	"net/http"
 	"os"
 
@@ -12,6 +13,8 @@ import (
 )
 
 func init() {
+	// LOAD VAR IN LOCAL ENVIRONMENT
+	_ = godotenv.Load(".env")
 	services.MySigningKey = []byte(os.Getenv("SIGNING_KEY"))
 }
 
