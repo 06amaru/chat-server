@@ -7,9 +7,25 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"io"
+	"math/big"
 )
 
-func createHash(key string) string {
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{};:,.<>/?"
+const length = 30
+
+func GenerateKey() []byte {
+	key := make([]byte, length)
+	charsetLength := big.NewInt(int64(len(charset)))
+
+	for i := 0; i < 30; i++ {
+		index, _ := rand.Int(rand.Reader, charsetLength)
+		key[i] = charset[index.Int64()]
+	}
+
+	return key
+}
+
+func CreateHash(key string) string {
 	// New returns a new hash.Hash computing the MD5 checksum.
 	hasher := md5.New()
 	// Write adds more data to the running hash.
@@ -21,8 +37,8 @@ func createHash(key string) string {
 	return hex.EncodeToString(hasher.Sum(nil))
 }
 
-func encrypt(data []byte, passhprase string) []byte {
-	key := []byte(createHash(passhprase))
+func Encrypt(data []byte, passhprase string) []byte {
+	key := []byte(CreateHash(passhprase))
 
 	block, _ := aes.NewCipher(key)
 
@@ -49,8 +65,8 @@ func encrypt(data []byte, passhprase string) []byte {
 	return ciphertext
 }
 
-func decrypt(data []byte, passhprase string) []byte {
-	key := []byte(createHash(passhprase))
+func Decrypt(data []byte, passhprase string) []byte {
+	key := []byte(CreateHash(passhprase))
 
 	block, _ := aes.NewCipher(key)
 

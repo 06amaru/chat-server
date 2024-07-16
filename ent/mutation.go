@@ -1128,7 +1128,7 @@ type UserMutation struct {
 	username        *string
 	created_at      *time.Time
 	password        *string
-	private_key     *string
+	private_key     *[]byte
 	public_key      *[]byte
 	clearedFields   map[string]struct{}
 	messages        map[int]struct{}
@@ -1349,12 +1349,12 @@ func (m *UserMutation) ResetPassword() {
 }
 
 // SetPrivateKey sets the "private_key" field.
-func (m *UserMutation) SetPrivateKey(s string) {
-	m.private_key = &s
+func (m *UserMutation) SetPrivateKey(b []byte) {
+	m.private_key = &b
 }
 
 // PrivateKey returns the value of the "private_key" field in the mutation.
-func (m *UserMutation) PrivateKey() (r string, exists bool) {
+func (m *UserMutation) PrivateKey() (r []byte, exists bool) {
 	v := m.private_key
 	if v == nil {
 		return
@@ -1365,7 +1365,7 @@ func (m *UserMutation) PrivateKey() (r string, exists bool) {
 // OldPrivateKey returns the old "private_key" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldPrivateKey(ctx context.Context) (v string, err error) {
+func (m *UserMutation) OldPrivateKey(ctx context.Context) (v []byte, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldPrivateKey is only allowed on UpdateOne operations")
 	}
@@ -1646,7 +1646,7 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		m.SetPassword(v)
 		return nil
 	case user.FieldPrivateKey:
-		v, ok := value.(string)
+		v, ok := value.([]byte)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

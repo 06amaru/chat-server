@@ -36,6 +36,14 @@ func (mu *MessageUpdate) SetBody(s string) *MessageUpdate {
 	return mu
 }
 
+// SetNillableBody sets the "body" field if the given value is not nil.
+func (mu *MessageUpdate) SetNillableBody(s *string) *MessageUpdate {
+	if s != nil {
+		mu.SetBody(*s)
+	}
+	return mu
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (mu *MessageUpdate) SetCreatedAt(t time.Time) *MessageUpdate {
 	mu.mutation.SetCreatedAt(t)
@@ -268,6 +276,14 @@ type MessageUpdateOne struct {
 // SetBody sets the "body" field.
 func (muo *MessageUpdateOne) SetBody(s string) *MessageUpdateOne {
 	muo.mutation.SetBody(s)
+	return muo
+}
+
+// SetNillableBody sets the "body" field if the given value is not nil.
+func (muo *MessageUpdateOne) SetNillableBody(s *string) *MessageUpdateOne {
+	if s != nil {
+		muo.SetBody(*s)
+	}
 	return muo
 }
 

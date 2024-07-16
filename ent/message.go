@@ -43,12 +43,10 @@ type MessageEdges struct {
 // FromOrErr returns the From value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e MessageEdges) FromOrErr() (*User, error) {
-	if e.loadedTypes[0] {
-		if e.From == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: user.Label}
-		}
+	if e.From != nil {
 		return e.From, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: user.Label}
 	}
 	return nil, &NotLoadedError{edge: "from"}
 }

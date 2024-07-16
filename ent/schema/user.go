@@ -18,8 +18,8 @@ func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("username").Unique(),
 		field.Time("created_at").Default(time.Now),
-		field.String("password").Default("isnotasecret"),
-		field.String("private_key").Default("unknown"),
+		field.String("password"),
+		field.Bytes("private_key"),
 		field.Bytes("public_key"),
 	}
 }

@@ -4,12 +4,9 @@ import (
 	"time"
 
 	"github.com/jaox1/chat-server/models"
+	"github.com/jaox1/chat-server/security"
 
 	"github.com/golang-jwt/jwt"
-)
-
-var (
-	MySigningKey []byte
 )
 
 type JwtClaims struct {
@@ -27,6 +24,6 @@ func makeToken(cred models.Credentials) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwtClaims)
 
-	ss, err := token.SignedString(MySigningKey)
+	ss, err := token.SignedString(security.MySigningKey)
 	return ss, err
 }

@@ -1,11 +1,12 @@
 package controllers
 
 import (
+	"net/http"
+
 	"github.com/jaox1/chat-server/models"
 	"github.com/jaox1/chat-server/repository"
 	"github.com/jaox1/chat-server/services"
 	"github.com/labstack/echo/v4"
-	"net/http"
 )
 
 type AuthController struct {
@@ -20,20 +21,6 @@ func NewAuthController() AuthController {
 	}
 }
 
-func (ctrl AuthController) SignUp(c echo.Context) error {
-	user := new(models.User)
-	if err := c.Bind(user); err != nil {
-		return err
-	}
-
-	err := ctrl.service.SignUp(*user)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err.Error())
-	}
-
-	return c.NoContent(http.StatusAccepted)
-}
-
 func (ctrl AuthController) SignIn(c echo.Context) error {
 	cred := new(models.Credentials)
 	if err := c.Bind(cred); err != nil {
@@ -42,7 +29,7 @@ func (ctrl AuthController) SignIn(c echo.Context) error {
 
 	token, err := ctrl.service.SignIn(*cred)
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, err)
+		return c.JSON(http.StatusUnauthorized, err.Error())
 	}
 
 	return c.JSON(http.StatusOK, token)

@@ -36,6 +36,14 @@ func (uu *UserUpdate) SetUsername(s string) *UserUpdate {
 	return uu
 }
 
+// SetNillableUsername sets the "username" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableUsername(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetUsername(*s)
+	}
+	return uu
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (uu *UserUpdate) SetCreatedAt(t time.Time) *UserUpdate {
 	uu.mutation.SetCreatedAt(t)
@@ -65,16 +73,8 @@ func (uu *UserUpdate) SetNillablePassword(s *string) *UserUpdate {
 }
 
 // SetPrivateKey sets the "private_key" field.
-func (uu *UserUpdate) SetPrivateKey(s string) *UserUpdate {
-	uu.mutation.SetPrivateKey(s)
-	return uu
-}
-
-// SetNillablePrivateKey sets the "private_key" field if the given value is not nil.
-func (uu *UserUpdate) SetNillablePrivateKey(s *string) *UserUpdate {
-	if s != nil {
-		uu.SetPrivateKey(*s)
-	}
+func (uu *UserUpdate) SetPrivateKey(b []byte) *UserUpdate {
+	uu.mutation.SetPrivateKey(b)
 	return uu
 }
 
@@ -207,7 +207,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 	}
 	if value, ok := uu.mutation.PrivateKey(); ok {
-		_spec.SetField(user.FieldPrivateKey, field.TypeString, value)
+		_spec.SetField(user.FieldPrivateKey, field.TypeBytes, value)
 	}
 	if value, ok := uu.mutation.PublicKey(); ok {
 		_spec.SetField(user.FieldPublicKey, field.TypeBytes, value)
@@ -328,6 +328,14 @@ func (uuo *UserUpdateOne) SetUsername(s string) *UserUpdateOne {
 	return uuo
 }
 
+// SetNillableUsername sets the "username" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableUsername(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetUsername(*s)
+	}
+	return uuo
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (uuo *UserUpdateOne) SetCreatedAt(t time.Time) *UserUpdateOne {
 	uuo.mutation.SetCreatedAt(t)
@@ -357,16 +365,8 @@ func (uuo *UserUpdateOne) SetNillablePassword(s *string) *UserUpdateOne {
 }
 
 // SetPrivateKey sets the "private_key" field.
-func (uuo *UserUpdateOne) SetPrivateKey(s string) *UserUpdateOne {
-	uuo.mutation.SetPrivateKey(s)
-	return uuo
-}
-
-// SetNillablePrivateKey sets the "private_key" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillablePrivateKey(s *string) *UserUpdateOne {
-	if s != nil {
-		uuo.SetPrivateKey(*s)
-	}
+func (uuo *UserUpdateOne) SetPrivateKey(b []byte) *UserUpdateOne {
+	uuo.mutation.SetPrivateKey(b)
 	return uuo
 }
 
@@ -529,7 +529,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 	}
 	if value, ok := uuo.mutation.PrivateKey(); ok {
-		_spec.SetField(user.FieldPrivateKey, field.TypeString, value)
+		_spec.SetField(user.FieldPrivateKey, field.TypeBytes, value)
 	}
 	if value, ok := uuo.mutation.PublicKey(); ok {
 		_spec.SetField(user.FieldPublicKey, field.TypeBytes, value)

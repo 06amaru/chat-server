@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/jaox1/chat-server/services"
-
 	"github.com/golang-jwt/jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-var config = middleware.DefaultJWTConfig
+var (
+	config       = middleware.DefaultJWTConfig
+	MySigningKey []byte
+)
 
 func getSigningKey(token *jwt.Token) (interface{}, error) {
 	if token.Method.Alg() != config.SigningMethod {
@@ -40,7 +41,7 @@ func CustomMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 				data = (*cookie).Value
 			}
 		}
-		config.SigningKey = services.MySigningKey
+		config.SigningKey = MySigningKey
 		config.KeyFunc = getSigningKey
 
 		token, err := parseToken(data)

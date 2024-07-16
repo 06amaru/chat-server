@@ -73,10 +73,6 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
-	// DefaultPassword holds the default value on creation for the "password" field.
-	DefaultPassword string
-	// DefaultPrivateKey holds the default value on creation for the "private_key" field.
-	DefaultPrivateKey string
 )
 
 // OrderOption defines the ordering options for the User queries.
@@ -100,11 +96,6 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByPassword orders the results by the password field.
 func ByPassword(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPassword, opts...).ToFunc()
-}
-
-// ByPrivateKey orders the results by the private_key field.
-func ByPrivateKey(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldPrivateKey, opts...).ToFunc()
 }
 
 // ByMessagesCount orders the results by messages count.

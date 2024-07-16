@@ -46,8 +46,8 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "username", Type: field.TypeString, Unique: true},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "password", Type: field.TypeString, Default: "isnotasecret"},
-		{Name: "private_key", Type: field.TypeString, Default: "unknown"},
+		{Name: "password", Type: field.TypeString},
+		{Name: "private_key", Type: field.TypeBytes},
 		{Name: "public_key", Type: field.TypeBytes},
 	}
 	// UsersTable holds the schema information for the "users" table.

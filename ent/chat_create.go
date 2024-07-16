@@ -197,11 +197,15 @@ func (cc *ChatCreate) createSpec() (*Chat, *sqlgraph.CreateSpec) {
 // ChatCreateBulk is the builder for creating many Chat entities in bulk.
 type ChatCreateBulk struct {
 	config
+	err      error
 	builders []*ChatCreate
 }
 
 // Save creates the Chat entities in the database.
 func (ccb *ChatCreateBulk) Save(ctx context.Context) ([]*Chat, error) {
+	if ccb.err != nil {
+		return nil, ccb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(ccb.builders))
 	nodes := make([]*Chat, len(ccb.builders))
 	mutators := make([]Mutator, len(ccb.builders))

@@ -48,25 +48,9 @@ func (uc *UserCreate) SetPassword(s string) *UserCreate {
 	return uc
 }
 
-// SetNillablePassword sets the "password" field if the given value is not nil.
-func (uc *UserCreate) SetNillablePassword(s *string) *UserCreate {
-	if s != nil {
-		uc.SetPassword(*s)
-	}
-	return uc
-}
-
 // SetPrivateKey sets the "private_key" field.
-func (uc *UserCreate) SetPrivateKey(s string) *UserCreate {
-	uc.mutation.SetPrivateKey(s)
-	return uc
-}
-
-// SetNillablePrivateKey sets the "private_key" field if the given value is not nil.
-func (uc *UserCreate) SetNillablePrivateKey(s *string) *UserCreate {
-	if s != nil {
-		uc.SetPrivateKey(*s)
-	}
+func (uc *UserCreate) SetPrivateKey(b []byte) *UserCreate {
+	uc.mutation.SetPrivateKey(b)
 	return uc
 }
 
@@ -145,14 +129,6 @@ func (uc *UserCreate) defaults() {
 		v := user.DefaultCreatedAt()
 		uc.mutation.SetCreatedAt(v)
 	}
-	if _, ok := uc.mutation.Password(); !ok {
-		v := user.DefaultPassword
-		uc.mutation.SetPassword(v)
-	}
-	if _, ok := uc.mutation.PrivateKey(); !ok {
-		v := user.DefaultPrivateKey
-		uc.mutation.SetPrivateKey(v)
-	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -211,7 +187,7 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_node.Password = value
 	}
 	if value, ok := uc.mutation.PrivateKey(); ok {
-		_spec.SetField(user.FieldPrivateKey, field.TypeString, value)
+		_spec.SetField(user.FieldPrivateKey, field.TypeBytes, value)
 		_node.PrivateKey = value
 	}
 	if value, ok := uc.mutation.PublicKey(); ok {
@@ -256,11 +232,15 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 // UserCreateBulk is the builder for creating many User entities in bulk.
 type UserCreateBulk struct {
 	config
+	err      error
 	builders []*UserCreate
 }
 
 // Save creates the User entities in the database.
 func (ucb *UserCreateBulk) Save(ctx context.Context) ([]*User, error) {
+	if ucb.err != nil {
+		return nil, ucb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(ucb.builders))
 	nodes := make([]*User, len(ucb.builders))
 	mutators := make([]Mutator, len(ucb.builders))

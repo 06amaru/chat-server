@@ -71,7 +71,7 @@ func Password(v string) predicate.User {
 }
 
 // PrivateKey applies equality check predicate on the "private_key" field. It's identical to PrivateKeyEQ.
-func PrivateKey(v string) predicate.User {
+func PrivateKey(v []byte) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldPrivateKey, v))
 }
 
@@ -251,68 +251,43 @@ func PasswordContainsFold(v string) predicate.User {
 }
 
 // PrivateKeyEQ applies the EQ predicate on the "private_key" field.
-func PrivateKeyEQ(v string) predicate.User {
+func PrivateKeyEQ(v []byte) predicate.User {
 	return predicate.User(sql.FieldEQ(FieldPrivateKey, v))
 }
 
 // PrivateKeyNEQ applies the NEQ predicate on the "private_key" field.
-func PrivateKeyNEQ(v string) predicate.User {
+func PrivateKeyNEQ(v []byte) predicate.User {
 	return predicate.User(sql.FieldNEQ(FieldPrivateKey, v))
 }
 
 // PrivateKeyIn applies the In predicate on the "private_key" field.
-func PrivateKeyIn(vs ...string) predicate.User {
+func PrivateKeyIn(vs ...[]byte) predicate.User {
 	return predicate.User(sql.FieldIn(FieldPrivateKey, vs...))
 }
 
 // PrivateKeyNotIn applies the NotIn predicate on the "private_key" field.
-func PrivateKeyNotIn(vs ...string) predicate.User {
+func PrivateKeyNotIn(vs ...[]byte) predicate.User {
 	return predicate.User(sql.FieldNotIn(FieldPrivateKey, vs...))
 }
 
 // PrivateKeyGT applies the GT predicate on the "private_key" field.
-func PrivateKeyGT(v string) predicate.User {
+func PrivateKeyGT(v []byte) predicate.User {
 	return predicate.User(sql.FieldGT(FieldPrivateKey, v))
 }
 
 // PrivateKeyGTE applies the GTE predicate on the "private_key" field.
-func PrivateKeyGTE(v string) predicate.User {
+func PrivateKeyGTE(v []byte) predicate.User {
 	return predicate.User(sql.FieldGTE(FieldPrivateKey, v))
 }
 
 // PrivateKeyLT applies the LT predicate on the "private_key" field.
-func PrivateKeyLT(v string) predicate.User {
+func PrivateKeyLT(v []byte) predicate.User {
 	return predicate.User(sql.FieldLT(FieldPrivateKey, v))
 }
 
 // PrivateKeyLTE applies the LTE predicate on the "private_key" field.
-func PrivateKeyLTE(v string) predicate.User {
+func PrivateKeyLTE(v []byte) predicate.User {
 	return predicate.User(sql.FieldLTE(FieldPrivateKey, v))
-}
-
-// PrivateKeyContains applies the Contains predicate on the "private_key" field.
-func PrivateKeyContains(v string) predicate.User {
-	return predicate.User(sql.FieldContains(FieldPrivateKey, v))
-}
-
-// PrivateKeyHasPrefix applies the HasPrefix predicate on the "private_key" field.
-func PrivateKeyHasPrefix(v string) predicate.User {
-	return predicate.User(sql.FieldHasPrefix(FieldPrivateKey, v))
-}
-
-// PrivateKeyHasSuffix applies the HasSuffix predicate on the "private_key" field.
-func PrivateKeyHasSuffix(v string) predicate.User {
-	return predicate.User(sql.FieldHasSuffix(FieldPrivateKey, v))
-}
-
-// PrivateKeyEqualFold applies the EqualFold predicate on the "private_key" field.
-func PrivateKeyEqualFold(v string) predicate.User {
-	return predicate.User(sql.FieldEqualFold(FieldPrivateKey, v))
-}
-
-// PrivateKeyContainsFold applies the ContainsFold predicate on the "private_key" field.
-func PrivateKeyContainsFold(v string) predicate.User {
-	return predicate.User(sql.FieldContainsFold(FieldPrivateKey, v))
 }
 
 // PublicKeyEQ applies the EQ predicate on the "public_key" field.
@@ -403,32 +378,15 @@ func HasChatsWith(preds ...predicate.Chat) predicate.User {
 
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.User) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for _, p := range predicates {
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.User(sql.AndPredicates(predicates...))
 }
 
 // Or groups predicates with the OR operator between them.
 func Or(predicates ...predicate.User) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		s1 := s.Clone().SetP(nil)
-		for i, p := range predicates {
-			if i > 0 {
-				s1.Or()
-			}
-			p(s1)
-		}
-		s.Where(s1.P())
-	})
+	return predicate.User(sql.OrPredicates(predicates...))
 }
 
 // Not applies the not operator on the given predicate.
 func Not(p predicate.User) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		p(s.Not())
-	})
+	return predicate.User(sql.NotPredicates(p))
 }

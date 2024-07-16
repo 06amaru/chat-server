@@ -1,13 +1,14 @@
 package main
 
 import (
-	"github.com/joho/godotenv"
 	"net/http"
 	"os"
 
+	"github.com/joho/godotenv"
+
 	"github.com/jaox1/chat-server/controllers"
+	"github.com/jaox1/chat-server/models"
 	"github.com/jaox1/chat-server/security"
-	"github.com/jaox1/chat-server/services"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -15,7 +16,7 @@ import (
 func init() {
 	// LOAD VAR IN LOCAL ENVIRONMENT
 	_ = godotenv.Load(".env")
-	services.MySigningKey = []byte(os.Getenv("SIGNING_KEY"))
+	security.MySigningKey = []byte(os.Getenv("SIGNING_KEY"))
 }
 
 func main() {
@@ -31,10 +32,10 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
+	e.GET("/health-check", func(ctx echo.Context) error { return ctx.JSON(200, models.HealthCheck{Status: "UP"}) })
+
 	authController := controllers.NewAuthController()
-	//TODO HASH PASSWORD
-	//curl -X POST -H 'Content-Type: application/json' -d '{"username":"jaoks", "password":"sdtc"}' localhost:8081/register
-	e.POST("/register", authController.SignUp)
+
 	// curl -X POST -H 'Content-Type: application/json' -d '{"username":"jaoks", "password":"sdtc"}' localhost:8081/login
 	e.POST("/login", authController.SignIn)
 

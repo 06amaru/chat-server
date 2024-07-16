@@ -35,6 +35,14 @@ func (cu *ChatUpdate) SetType(c chat.Type) *ChatUpdate {
 	return cu
 }
 
+// SetNillableType sets the "type" field if the given value is not nil.
+func (cu *ChatUpdate) SetNillableType(c *chat.Type) *ChatUpdate {
+	if c != nil {
+		cu.SetType(*c)
+	}
+	return cu
+}
+
 // SetDeleted sets the "deleted" field.
 func (cu *ChatUpdate) SetDeleted(b bool) *ChatUpdate {
 	cu.mutation.SetDeleted(b)
@@ -294,6 +302,14 @@ type ChatUpdateOne struct {
 // SetType sets the "type" field.
 func (cuo *ChatUpdateOne) SetType(c chat.Type) *ChatUpdateOne {
 	cuo.mutation.SetType(c)
+	return cuo
+}
+
+// SetNillableType sets the "type" field if the given value is not nil.
+func (cuo *ChatUpdateOne) SetNillableType(c *chat.Type) *ChatUpdateOne {
+	if c != nil {
+		cuo.SetType(*c)
+	}
 	return cuo
 }
 

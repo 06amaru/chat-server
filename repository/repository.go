@@ -22,13 +22,14 @@ func NewRepository() *Repository {
 		Client: postgres,
 	}
 }
-func (repo Repository) SignUp(user models.User) error {
+
+func (repo Repository) SignUp(username, password string, privateK, publicK []byte) error {
 	_, err := repo.Client.User.
 		Create().
-		SetUsername(user.Username).
-		SetPassword(user.Password).
-		SetPrivateKey(user.PrivateKey).
-		SetPublicKey(user.PublicKey).
+		SetUsername(username).
+		SetPassword(password).
+		SetPrivateKey(privateK).
+		SetPublicKey(publicK).
 		Save(context.Background())
 
 	if err != nil {

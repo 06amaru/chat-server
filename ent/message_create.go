@@ -203,11 +203,15 @@ func (mc *MessageCreate) createSpec() (*Message, *sqlgraph.CreateSpec) {
 // MessageCreateBulk is the builder for creating many Message entities in bulk.
 type MessageCreateBulk struct {
 	config
+	err      error
 	builders []*MessageCreate
 }
 
 // Save creates the Message entities in the database.
 func (mcb *MessageCreateBulk) Save(ctx context.Context) ([]*Message, error) {
+	if mcb.err != nil {
+		return nil, mcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(mcb.builders))
 	nodes := make([]*Message, len(mcb.builders))
 	mutators := make([]Mutator, len(mcb.builders))
