@@ -125,7 +125,7 @@ func (ctrl ChatController) CreateChat(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 	defer ws.Close()
-	err = ctrl.svc.CreateChat(chat.Receiver, chat.Sender, ws)
+	err = ctrl.svc.CreateChat(chat.Sender, chat.Receiver, ws)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
