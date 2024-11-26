@@ -120,12 +120,7 @@ func (ctrl ChatController) CreateChat(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
 
-	ws, err := Upgrade(c.Response(), c.Request())
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, err)
-	}
-	defer ws.Close()
-	err = ctrl.svc.CreateChat(chat.Sender, chat.Receiver, ws)
+	err = ctrl.svc.CreateChat(chat.Sender, chat.Receiver)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}
@@ -140,15 +135,10 @@ func (ctrl ChatController) JoinChat(c echo.Context) error {
 	}
 	defer ws.Close()
 
-	chatID, err := strconv.Atoi(c.QueryParam("id"))
-	if err != nil {
-		return c.JSON(http.StatusBadRequest, err)
-	}
-
 	token := c.Get("user").(*jwt.Token)
-	from := token.Claims.(jwt.MapClaims)["username"].(string)
+	username := token.Claims.(jwt.MapClaims)["username"].(string)
 
-	err = ctrl.svc.JoinChat(chatID, from, ws)
+	err = ctrl.svc.Subscribe(username, ws)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err)
 	}

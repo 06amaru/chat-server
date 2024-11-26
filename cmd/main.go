@@ -50,13 +50,13 @@ func main() {
 	// curl "localhost:8081/api/:chatID/messages?limit=5&offset=0" --cookie "token=<YOUR_TOKEN>"
 	protected.GET("/:chatID/messages", chatController.GetMessages)
 
-	sockets := e.Group("/socket")
-	sockets.Use(security.CustomMiddleware)
-	// websocat "ws://localhost:8081/socket/join?id=<CHAT_ID>" -H "Cookie: token=<YOUR_TOKEN>"
-	sockets.GET("/join", chatController.JoinChat)
+	// curl "localhost:8081/api/create-chat?to=<USERNAME>" --cookie "token=<YOUR_TOKEN>"
+	protected.POST("/create-chat", chatController.CreateChat)
 
-	// websocat "ws://localhost:8081/socket/create-chat?to=<USERNAME>" -H "Cookie: token=<YOUR_TOKEN>"
-	sockets.GET("/create-chat", chatController.CreateChat)
+	sockets := e.Group("/ws")
+	sockets.Use(security.CustomMiddleware)
+	// websocat "ws://localhost:8081/ws/join?id=<CHAT_ID>" -H "Cookie: token=<YOUR_TOKEN>"
+	sockets.GET("/join", chatController.JoinChat)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8081"))

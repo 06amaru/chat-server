@@ -3,56 +3,76 @@ package chat
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 
 	"github.com/gorilla/websocket"
 	"github.com/jaox1/chat-server/ent"
+	"github.com/jaox1/chat-server/models"
 )
 
+/*
+User has own web socket connection, database client and needs to socket manager
+in order to send and receive message from other users.
+*/
 type User struct {
-	Username string
-	Conn     *websocket.Conn
-	Room     *Chat
+	Username      string
+	Conn          *websocket.Conn
+	SocketManager *SocketManager
+	Database      *ent.Client
+	EntUser       *ent.User
 }
 
-func (u *User) Read(client *ent.Client, userClient *ent.User, chatID int) {
+/*
+Listen() is a for-loop where the user gets incoming message by websocket.
+The message is serialized, stored in DB and then sent to websocket manager.
+*/
+func (u *User) Listen() error {
 	defer func() {
 		//necesitamos avisar al Chat que user se fue
-		u.Room.Leave <- u
+		u.SocketManager.Leave <- u
 	}()
 	for {
 		if _, message, err := u.Conn.ReadMessage(); err != nil {
 			log.Println("Error on read message =>\n", err.Error())
-			break
+			return err
 		} else {
-			fmt.Println("reading ...")
-			fmt.Println(message)
-			msg, err := client.Message.
+			msgSerialized := &models.Message{}
+			err := json.Unmarshal(message, msgSerialized)
+			if err != nil {
+				log.Print(err)
+				return err
+			}
+
+			msg, err := u.Database.Message.
 				Create().
-				SetBody(string(message)).
-				SetFrom(userClient).
+				SetBody(*msgSerialized.Body).
+				SetFrom(u.EntUser).
 				Save(context.Background())
 			if err != nil {
 				log.Print(err)
-				break
+				return err
 			}
 
-			_, err = client.Chat.
-				UpdateOneID(chatID).
+			_, err = u.Database.Chat.
+				UpdateOneID(int(*msgSerialized.ChatID)).
 				AddMessageIDs(msg.ID).
 				Save(context.Background())
 			if err != nil {
 				log.Print(err)
-				break
+				return err
 			}
 
-			u.Room.Messages <- NewMessage(string(message), u.Username)
+			u.SocketManager.Messages <- &models.Message{
+				Body:     msgSerialized.Body,
+				Sender:   msgSerialized.Sender,
+				Receiver: msgSerialized.Receiver,
+				ChatID:   msgSerialized.ChatID,
+			}
 		}
 	}
 }
 
-func (u *User) Write(message *Message) {
+func (u *User) Send(message *models.Message) {
 	b, _ := json.Marshal(message)
 
 	if err := u.Conn.WriteMessage(websocket.TextMessage, b); err != nil {
