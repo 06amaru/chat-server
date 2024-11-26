@@ -3,11 +3,12 @@ package repository
 import (
 	"context"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/jaox1/chat-server/db"
 	"github.com/jaox1/chat-server/ent"
-	chatEnt "github.com/jaox1/chat-server/ent/chat"
-	"github.com/jaox1/chat-server/ent/message"
-	userEnt "github.com/jaox1/chat-server/ent/user"
+	ec "github.com/jaox1/chat-server/ent/chat"
+	em "github.com/jaox1/chat-server/ent/message"
+	eu "github.com/jaox1/chat-server/ent/user"
 	"github.com/jaox1/chat-server/models"
 )
 
@@ -42,7 +43,7 @@ func (repo Repository) SignUp(username, password string, privateK, publicK []byt
 func (repo Repository) FindUser(username string) (*ent.User, error) {
 	user, err := repo.Client.User.
 		Query().
-		Where(userEnt.UsernameEQ(username)).
+		Where(eu.UsernameEQ(username)).
 		First(context.Background())
 
 	if err != nil {
@@ -60,7 +61,7 @@ func (repo Repository) GetChatMembers(chatID int) ([]*ent.User, error) {
 	}
 
 	members, err := chat.QueryMembers().
-		Select(userEnt.FieldUsername, userEnt.FieldPublicKey).
+		Select(eu.FieldUsername, eu.FieldPublicKey).
 		All(context.Background())
 	if err != nil {
 		return nil, err
@@ -70,10 +71,17 @@ func (repo Repository) GetChatMembers(chatID int) ([]*ent.User, error) {
 }
 
 func (repo Repository) GetChats(username string) ([]*models.Chat, error) {
-	user, err := repo.Client.User.Query().Where(userEnt.UsernameEQ(username)).
-		WithChats(func(query *ent.ChatQuery) {
-			query.WithMembers()
-		}).First(context.Background())
+	user, err := repo.Client.User.Query().
+		Where(eu.UsernameEQ(username)).
+		WithChats(func(cq *ent.ChatQuery) {
+			cq.WithMembers()
+		}).
+		Order(
+			eu.OrderOption(em.ByID(
+				sql.OrderDesc(),
+			)),
+		).
+		First(context.Background())
 	if err != nil {
 		return nil, err
 	}
@@ -83,8 +91,8 @@ func (repo Repository) GetChats(username string) ([]*models.Chat, error) {
 		for _, member := range chat.Edges.Members {
 			if member.Username != username {
 				newChat := &models.Chat{
-					ChatID: chat.ID,
-					Sender: member.Username,
+					ChatID:   chat.ID,
+					Username: member.Username,
 				}
 				response = append(response, newChat)
 			}
@@ -97,9 +105,9 @@ func (repo Repository) GetChats(username string) ([]*models.Chat, error) {
 func (repo Repository) FindChatByUsernames(to, from string) (*ent.Chat, error) {
 	chat, err := repo.Client.Chat.
 		Query().
-		Where(chatEnt.And(
-			chatEnt.HasMembersWith(userEnt.UsernameEQ(to)),
-			chatEnt.HasMembersWith(userEnt.UsernameEQ(from)),
+		Where(ec.And(
+			ec.HasMembersWith(eu.UsernameEQ(to)),
+			ec.HasMembersWith(eu.UsernameEQ(from)),
 		)).
 		Only(context.Background())
 
@@ -113,9 +121,9 @@ func (repo Repository) FindChatByUsernames(to, from string) (*ent.Chat, error) {
 func (repo Repository) FindChatByID(chatID int, from string) (*ent.Chat, error) {
 	chat, err := repo.Client.Chat.
 		Query().
-		Where(chatEnt.And(
-			chatEnt.HasMembersWith(userEnt.UsernameEQ(from)),
-			chatEnt.ID(chatID),
+		Where(ec.And(
+			ec.HasMembersWith(eu.UsernameEQ(from)),
+			ec.ID(chatID),
 		)).
 		Only(context.Background())
 
@@ -138,18 +146,30 @@ func (repo Repository) CreateChat(to, from int) (*ent.Chat, error) {
 	return chat, nil
 }
 
-func (repo Repository) GetMessages(chatID, limit, offset int) ([]*ent.Message, error) {
-	chat, err := repo.Client.Chat.Query().Where(chatEnt.ID(chatID)).Only(context.Background())
+func (repo Repository) GetMessages(chatID, limit, offset int) ([]*models.Message, error) {
+	chat, err := repo.Client.Chat.Query().Where(ec.ID(chatID)).Only(context.Background())
 	if err != nil {
 		return nil, err
 	}
 	messages, err := repo.Client.Chat.QueryMessages(chat).
+		WithFrom().
 		Limit(limit).
 		Offset(offset).
-		Order(ent.Desc(message.FieldCreatedAt)).
+		Order(ent.Desc(em.FieldCreatedAt)).
 		All(context.Background())
 	if err != nil {
 		return nil, err
 	}
-	return messages, nil
+
+	var response []*models.Message
+	for _, msg := range messages {
+		m := &models.Message{
+			ID:     &msg.ID,
+			Body:   &msg.Body,
+			Sender: &msg.Edges.From.Username,
+		}
+		response = append(response, m)
+	}
+
+	return response, nil
 }

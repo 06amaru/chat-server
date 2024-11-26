@@ -3,20 +3,23 @@ package services
 import (
 	"errors"
 	"fmt"
+
 	"github.com/gorilla/websocket"
-	apiChat "github.com/jaox1/chat-server/chat"
+	"github.com/jaox1/chat-server/chat"
 	"github.com/jaox1/chat-server/ent"
 	"github.com/jaox1/chat-server/models"
 	"github.com/jaox1/chat-server/repository"
 )
 
 type ChatService struct {
-	repo  *repository.Repository
-	chats map[int]*apiChat.Chat
+	repo          *repository.Repository
+	socketManager *chat.SocketManager
 }
 
 func NewChatService(repo *repository.Repository) ChatService {
-	return ChatService{repo: repo, chats: map[int]*apiChat.Chat{}}
+	newSocketManager := chat.NewSocketManager()
+	go newSocketManager.Run()
+	return ChatService{repo: repo, socketManager: newSocketManager}
 }
 
 func (svc ChatService) GetMembers(chatID int) ([]models.User, error) {
@@ -54,13 +57,7 @@ func (svc ChatService) GetChats(username string) ([]*models.Chat, error) {
 	return chats, nil
 }
 
-type ChatModel struct {
-	Chat     *ent.Chat
-	Receiver *ent.User
-	Sender   *ent.User
-}
-
-func (svc ChatService) VerifyChat(to, from string) (*ChatModel, error) {
+func (svc ChatService) VerifyChat(to, from string) (*models.EntChat, error) {
 	receiver, err := svc.repo.FindUser(to)
 	if err != nil {
 		return nil, err
@@ -76,8 +73,8 @@ func (svc ChatService) VerifyChat(to, from string) (*ChatModel, error) {
 		var notFoundError *ent.NotFoundError
 		switch {
 		case errors.As(err, &notFoundError):
-			fmt.Println("this chat can be created")
-			return &ChatModel{
+			// this chat can be created
+			return &models.EntChat{
 				Chat:     chat,
 				Receiver: receiver,
 				Sender:   sender,
@@ -90,13 +87,11 @@ func (svc ChatService) VerifyChat(to, from string) (*ChatModel, error) {
 	return nil, fmt.Errorf("chat with ID %d exists between %s and %s", chat.ID, to, from)
 }
 
-func (svc ChatService) CreateChat(sender, receiver *ent.User, ws *websocket.Conn) error {
-	chat, err := svc.repo.CreateChat(sender.ID, receiver.ID)
+func (svc ChatService) CreateChat(sender, receiver *ent.User) error {
+	_, err := svc.repo.CreateChat(sender.ID, receiver.ID)
 	if err != nil {
 		return err
 	}
-
-	svc.runChat(sender, ws, chat)
 
 	return nil
 }
@@ -109,50 +104,20 @@ func (svc ChatService) existChat(to, from string) (*ent.Chat, error) {
 	return nil, err
 }
 
-func (svc ChatService) JoinChat(chatID int, sender string, ws *websocket.Conn) error {
-	user, err := svc.repo.FindUser(sender)
+func (svc ChatService) Subscribe(username string, ws *websocket.Conn) error {
+	user, err := svc.repo.FindUser(username)
 	if err != nil {
 		return err
 	}
 
-	chat, err := svc.repo.FindChatByID(chatID, sender)
-	if err != nil {
-		return err
+	newUser := &chat.User{
+		Username:      username,
+		Conn:          ws,
+		SocketManager: svc.socketManager,
+		Database:      svc.repo.Client,
+		EntUser:       user,
 	}
+	svc.socketManager.Join <- newUser
 
-	if room, ok := svc.chats[chatID]; ok {
-		newUser := &apiChat.User{
-			Username: sender,
-			Conn:     ws,
-			Room:     room,
-		}
-		room.Join <- newUser
-		newUser.Read(svc.repo.Client, user, chatID)
-	} else {
-		svc.runChat(user, ws, chat)
-	}
-
-	return nil
-}
-
-func (svc ChatService) runChat(user *ent.User, ws *websocket.Conn, chat *ent.Chat) {
-	newRoom := &apiChat.Chat{
-		Users:    make(map[string]*apiChat.User),
-		Messages: make(chan *apiChat.Message),
-		Join:     make(chan *apiChat.User),
-		Leave:    make(chan *apiChat.User),
-		Id:       chat.ID,
-	}
-
-	svc.chats[chat.ID] = newRoom
-	go newRoom.Run()
-
-	newUser := &apiChat.User{
-		Username: user.Username,
-		Conn:     ws,
-		Room:     newRoom,
-	}
-
-	newRoom.Join <- newUser
-	newUser.Read(svc.repo.Client, user, chat.ID)
+	return newUser.Listen()
 }
