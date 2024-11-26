@@ -1,6 +1,6 @@
 # Chat Server
 
-Chat using websockets and concurrency by channels.
+This server implements http, websockets to communicate between clients.
 
 ### Setup
 
